@@ -28,10 +28,14 @@
 
   // ---- colour rules -------------------------------------------------------
   const catColor = (c) => v(`--c${c}`);
+  // Legend order puts land uses that touch on the ground next to each other (agricultural/open
+  // space, industrial/commercial, commercial/corridor, residential/institutional); the palette
+  // was validated for colour-vision deficiency in this order. Values index meta.categories.
+  const LEGEND_ORDER = [6, 5, 3, 1, 2, 0, 4, 7, 8, 9, 10];
   const bylawClass = (b) => (b === 0 ? 0 : 1); // bylaws[0] is 05-200 (build_map sorts it first)
   function legendItems() {
     if (state.mode === "category") {
-      return meta.categories.map((name, i) => ({ key: i, name, color: catColor(i), n: meta.stats.by_category[name] || 0 }));
+      return LEGEND_ORDER.map((i) => ({ key: i, name: meta.categories[i], color: catColor(i), n: meta.stats.by_category[meta.categories[i]] || 0 }));
     }
     if (state.mode === "bylaw") {
       const by = meta.stats.by_bylaw;
