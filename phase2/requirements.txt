@@ -1,0 +1,5 @@
+numpy>=1.26
+pandas>=2.2
+pytest>=8
+# optional, only for pipeline/spatial.py
+geopandas>=1.0
