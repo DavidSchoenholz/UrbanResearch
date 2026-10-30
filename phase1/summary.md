@@ -1,45 +1,42 @@
 # Phase 1 summary: Toronto zoning and the housing pipeline
 
-**Verdict: GO WITH LIMITS (provisional).** The verdict is provisional because no primary source page could be opened in this session. The environment's network policy blocked the City of Toronto, CMHC, StatCan, Ontario and OLT hosts. Every claim comes from search-engine excerpts of primary URLs [S], third-party GitHub files that were opened [G], or recall [R, UNVERIFIED]. Nothing is "opened and verified." The full evidence is in `feasibility.md` and the dataset details are in `inventory.csv`.
+**Verdict: GO WITH LIMITS.** This is the second pass, after network access was opened. I read every Toronto open-data record through the City's open-data API and downloaded and profiled the files. I also fetched the City of Toronto, CMHC and OLT pages and pulled CMHC tables directly. StatCan (HTTP 403/503) and the Ontario legislature and e-Laws pages (403, or script-rendered) still could not be read, so claims that depend on them are marked UNVERIFIED.
 
 ## Key limitations
-1. **Zoning cannot be pulled as of the application date.**
-   - The open Zoning By-law layer is a current snapshot. A catalogue copy says it includes amendments "up to June 18th, 2023" [S].
-   - The only historical vintage found is from 2014-09-15 [S].
-   - Past zoning has to be rebuilt by backcasting with amending by-laws from the PDF archive, or the analysis restricted to lots whose zoning has not changed.
-2. **Zoning By-law 569-2013 did not fully replace the former by-laws.**
-   - It was enacted 2013-05-09.
-   - The former by-laws are "not repealed" and still govern the lands hatched on the Section 990.10 map.
-   - Some 569-2013 provisions remain under OLT appeal (PL130592 / OLT-22-002465) [S].
-3. **Applications and permits link at project level only for larger Planning-Act projects.** The Development Pipeline links them through `'Application Number'` = `APPLICATION#` [G]. Permit records have no application-number field [G], so as-of-right and minor-variance projects must be matched by address, `GEO_ID` or location.
-4. **A cleared permit is not a completion.** The candidate measures are:
-   - CMHC completions (site-visit based; a unit counts as complete with ≤10% of work left), at CMA, CSD and possibly census tract [S];
-   - the City's "Built" status, for Pipeline projects only [S];
-   - Census net dwelling change every 5 years.
-5. **Net units are weak.** `DWELLING_UNITS_LOST` is "rarely filled in" [G], and CMHC counts gross units only.
-6. **There is no open OLT appeal dataset.** The Case Status tool keeps closed cases for only 2 years, and decisions are online for 10 years [S]. Appeals can only be studied in a hand-coded sample.
-7. **Definitions drift.**
-   - The Pipeline uses a rolling 5-year window, and its 2024 and 2025 unit totals are not comparable [S].
-   - Wards were redrawn in 2018 [R].
-   - CMHC collects completions only in CMAs since 2023 [S].
-8. **Built-form data has no GFA or unit counts.** 3D Massing provides footprints and heights (`elez`, in metres) [S], so existing GFA has to be estimated.
+1. **Census-tract completions end in 2022.** CMHC returns census-tract completions for 2010–2022. Exports for 2023 onward say "This data series is now archived". Toronto-wide completions continue to 2025, and census-tract *starts* continue to 2025. The census tracts reconcile with the city total (16,292 vs. 16,296 in 2022).
+2. **Zoning history is only partly recoverable.**
+   - The open zoning layer is one snapshot, "updated to include amendments up to June 18th, 2023".
+   - Backcasting is possible for 569-2013 lands: 27.5% of 5,247 Chapter 900 exceptions cite their amending by-law with its year. The Wayback Machine also holds copies from 2023-04 and 2024-06.
+   - Lands still under former by-laws have no GIS. That covers 50.8% of 50+ unit new-building permit sites.
+3. **569-2013 did not fully replace the former by-laws.** The City says it "does not fully replace all older bylaws in every area". About 1,500 low-rise parcels were excluded, and 2026 by-laws are still bringing lands in. Some 2013 provisions remain under OLT appeal (PL130592 / OLT-22-002465).
+4. **Cleared permits are not completions.** Units on cleared permits equal 22–62% of CMHC completions each year 2002–2024 (correlation 0.23). The data has no 2007 clearances and a 2025 batch-closure spike.
+5. **Appeal history is overwritten.** Development Applications show current status only: 20–29% of 2020–2025 rezoning files show an appeal state, but only 0–5% of 2008–2015 files. There is no open OLT dataset; Case Status keeps cases two years after closure. Committee of Adjustment appeals are open (Toronto Local Appeal Body (TLAB) data, from 2017).
+6. **Application → permit links exist only for large Planning-Act projects.** The Development Pipeline links them for projects at or above the Site Plan threshold ("fewer than 10 units" are excluded). Its `Application Number` matches 96.9% of application records, and 98% of "Built" projects match a permit address. It has no permit IDs and no built dates. Everything else links by address.
+7. **Selection is severe.** Among 2018–2025 new-residential permits, 87% of 50+ unit projects are rezoning-linked, and 72–79% of 1–4 unit projects are linked to a minor variance (upper bounds).
+8. **Net units are weak.** `DWELLING_UNITS_LOST` is filled on about 35% of permits, and the fill rate rises over time.
 
-## Recommended frame (to confirm in Phase 2)
-- **Study period:**
-  - application cohorts 2016–2020 with outcomes observed to 2025-12-31;
-  - an as-of-right low-rise permit window from 2019-05 to 2026-09 around the **multiplex zoning in effect 2023-05-12** [S].
-- **Unit of analysis:** the 2021 census tract for analyses spanning all four stages; the parcel or project for stage-to-stage timing and attrition.
-- **Classes:** rezoning (OZ), minor variance (CoA MV) and as-of-right, always reported separately because of selection bias.
+## Recommended frame (Phase 2 to confirm)
+- **Period:**
+  - cohorts 2013-05-09 to 2017, with outcomes to 2022 (census-tract completions);
+  - an extension to 2025 using permits and census-tract starts;
+  - a multiplex marker window around 2023-05-10. New 2–6 unit permits went from 47 in 2022 to 243 in 2025.
+- **Unit of analysis:** address/parcel for timing and attrition; 2021 census tract for completions.
 
-## Must-verify checklist once the hosts are allowed
-1. The CKAN `datastore_search` schema for the cleared permits, active permits, development applications, Committee of Adjustment and zoning datasets. Confirm field names, the earliest `DATE_SUBMITTED` / `APPLICATION_DATE`, and the licence.
-2. Whether the Development Pipeline is an open download, and whether it contains permit numbers.
-3. Census-tract completions in CMHC's Housing Market Information Portal after 2023, and the suppression rate.
-4. The exception and holding attribute names in the Zoning Area layer, and whether the City archives past vintages.
-5. The terms of use for the OLT Case Status tool and the Application Information Centre before any automated access. Neither was scraped.
+## Corrections to the first (offline) pass
+- 3D Massing heights are `AVG_HEIGHT`/`MAX_HEIGHT`, not `elez`. Annual vintages exist for 2016–2023 and 2025.
+- Open GIS layers exist for Secondary Plans (2015 vintage) and SASPs (Dec 2025).
+- The Development Pipeline is an open dataset; `Active` merges three stages.
+- The holding and exception field names are `ZN_HOLDING`/`HOLDING_ID`/`ZN_EXCPTN`/`EXCPTN_NO` (now verified).
+- The Height Overlay field is `HT_LABEL`, not `HT_HEIGHT` as the readme says.
 
-Hosts to allow: `ckan0.cf.opendata.inter.prod-toronto.ca`, `open.toronto.ca`, `www.toronto.ca`, `www03.cmhc-schl.gc.ca`, `www.cmhc-schl.gc.ca`, `www12.statcan.gc.ca`, `www150.statcan.gc.ca`, `www.ontario.ca`, `ero.ontario.ca`, `olt.gov.on.ca` (environment settings → Network access; https://code.claude.com/docs/en/cloud-environments#network-access).
+## Still UNVERIFIED
+- Bill 23 and Bill 185 royal assent dates (2022-11-28; 2024-06-06).
+- The in-force dates of the multiplex (2023-05-12) and garden-suite (2022-07-04) by-laws.
+- StatCan Census fields and release dates.
+- The geography of CMHC's conversions and demolitions tables.
+- Whether files from before 2023 can be retrieved from the Wayback Machine.
 
 ## Files
-- `inventory.csv`: 28 datasets and sources, each with URL, publisher, licence, coverage, fields, limitations, join keys and provenance.
-- `feasibility.md`: operational definitions, verification table, policy time markers, the five gate answers and the verdict.
+- `inventory.csv`: 30 sources, with fields, coverage, limitations, join keys and provenance.
+- `feasibility.md`: definitions, verification, gate answers and verdict.
+- `scripts/`: profiling and linkage code. Data is not committed.

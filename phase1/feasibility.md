@@ -1,194 +1,250 @@
 # Phase 1 feasibility: Toronto zoning → application → approval → permit → completion
 
-Prepared 2026-10-30. Descriptive and associational only; no causal claims.
+Prepared 2026-10-30. The study is descriptive and associational; nothing here supports causal claims.
 
-## 0. Access limitations (read first)
+## 0. Access and evidence
 
-- **Web search worked; opening pages mostly did not.** The session's network policy blocked every primary host I tried: `ckan0.cf.opendata.inter.prod-toronto.ca`, `open.toronto.ca`, `www.toronto.ca`, `www150.statcan.gc.ca`, `www.ontario.ca`, `www03.cmhc-schl.gc.ca`, `geohub.lio.gov.on.ca` and `olt.gov.on.ca`. Only `github.com` and `raw.githubusercontent.com` opened.
-- **So no primary source was "opened and verified".** Each claim below carries one of three labels:
-  - **[S]**: seen in a search-engine excerpt of the cited primary URL. The page was not opened, so the claim is not fully verified.
-  - **[G]**: read in a third-party GitHub file that was opened. That is a secondary source.
-  - **[R]**: recalled from background knowledge and not opened. Treat [R] as **UNVERIFIED**.
-- **Code was runnable but no data was downloaded**, so no counts, match rates or coverage years come from my own computation.
-- **Re-running.** Phase 1 should be re-run with these hosts allowed (environment Network access → Allowed domains; see https://code.claude.com/docs/en/cloud-environments#network-access): `ckan0.cf.opendata.inter.prod-toronto.ca`, `open.toronto.ca`, `www.toronto.ca`, `www03.cmhc-schl.gc.ca`, `www.cmhc-schl.gc.ca`, `www12.statcan.gc.ca`, `www150.statcan.gc.ca`, `www.ontario.ca`, `ero.ontario.ca`, `olt.gov.on.ca`.
+**How the evidence was gathered.**
+- **Toronto open data:** every catalogue record was read through the City's open-data (CKAN) API, with metadata and field schemas taken from it. The data files were downloaded and profiled, with outputs held in a scratch directory and not committed.
+- **City pages:** City of Toronto, CMHC and OLT pages were fetched with `curl` and converted to text.
+- **CMHC tables:** pulled as CSV from the Housing Market Information Portal (HMIP) export endpoint.
+- **Scripts:** all are in `scripts/`.
+
+**Hosts I could not read:**
+- `www12.statcan.gc.ca` returned HTTP 403.
+- `www.statcan.gc.ca` (census release schedule) returned 503.
+- `www.ola.org` (bill status) returned 403.
+- `www.ontario.ca/laws` loads its content by script, so no statute text came back.
+
+Claims that rest on those sources are labelled **UNVERIFIED** or "[secondary]".
+
+**Labels used below:**
+- **[V]**: verified from the primary source or data in this session.
+- **[C]**: computed by me from downloaded primary data; the script is named.
+- **[secondary]** or **UNVERIFIED**: not confirmed from a primary source.
 
 ---
 
 ## 1. Operational definitions
 
 ### 1.1 Zoned capacity
-**Definition.** Zoned capacity is the maximum residential gross floor area (GFA) permitted on a lot by the zoning in force on a reference date, converted to units. Unused capacity is that capacity minus the existing built GFA.
+**Definition.** Zoned capacity is the maximum residential gross floor area (GFA) the zoning in force on date *t* permits on a lot, converted to units. It is compared with existing built floor area.
 
-**Formulas.**
-- `cap_GFA_far = FSI_TOTAL × lot_area`.
-  - `FSI_TOTAL` is the Zoning Area layer's numeric field. [S: the ZN_ZONE/FSI_TOTAL schema was seen in a third-party ArcGIS copy, https://services7.arcgis.com/AHJOWTX3sFcnmA9U/ArcGIS/rest/services/MidtermAssignment_WFL1/FeatureServer/3]
-  - `lot_area` comes from the Property Boundaries polygon (D13).
-- `cap_GFA_env = lot_area × lot_coverage × floors`.
-  - `floors = floor(HT / 3.0 m)`, where HT comes from the Height Overlay (or the zone label). The by-law says the permitted height is "the numerical value following the letters 'HT' on the Height Overlay Map" [S: https://www.toronto.ca/zoning/bylaw%5Famendments/ZBL_NewProvision_Chapter900_31.htm].
-  - `lot_coverage` comes from the Lot Coverage Overlay where one applies.
-  - The 3.0 m storey height is an assumption.
-- `cap_GFA = min(cap_GFA_far, cap_GFA_env)`, using whichever constraints exist.
-- `cap_units = cap_GFA / g`, where `g` is an assumed gross area per unit (for example 85 m² for apartments). Test sensitivity to `g`.
-- **Count rule for low-rise residential zones.** Here the binding constraint is the permitted unit count, not FSI. After the multiplex amendment (in effect 2023-05-12) up to 4 units are permitted in Neighbourhoods [S: https://www.toronto.ca/multiplex], so `cap_units = max(count rule, GFA rule)`.
+**Fields that implement it:** Zoning Area layer (`zoning-by-law`). The readme [V] defines:
+- `FSI_TOTAL`: "permitted maximum FSI … Total in the zone";
+- `PRCNT_RES`: the residential FSI share in mixed-use zones (the "r" value);
+- `DENSITY`: the "d" value in residential zones;
+- `UNITS`: the "u" value, a maximum unit count;
+- `AREA_UNITS`: minimum lot area per unit;
+- `COVERAGE`: lot coverage.
 
-**Existing built measure.** `built_GFA ≈ footprint_area × floor(elez / 3.0 m)`, using 3D Massing footprints, whose `elez` height attribute is in metres [S: https://library.torontomu.ca/gmdc/2015/01/20/toronto3dmassing/]. Existing units would come from 2021 Census dwellings at DA level (D22).
+Overlays add `HT_LABEL` (metres) and `HT_STORIES` from the Height Overlay, and `PRCNT_CVER` from the Lot Coverage Overlay. The readme calls the height field `HT_HEIGHT`, but the published file has `HT_LABEL` [V].
 
-**Building data needed.**
-- **Needed:** footprint, height or storeys, GFA and existing unit count per building.
-- **Openly available:** footprint + height only (3D Massing, LIDAR-derived, "illustrative only" disclaimer [S]).
-- **Missing:** GFA and unit counts per building are not in any open dataset I found. MPAC assessment data is not open [R]. Built GFA is therefore an estimate, and parcel-level unused capacity carries measurement error.
+**Formulas:**
+- `cap_GFA = lot_area × FSI`. Use `PRCNT_RES` in mixed-use zones, else `FSI_TOTAL`, else `DENSITY`.
+- Where no FSI applies, use the envelope: `lot_area × coverage × floor(HT_LABEL / 3.0 m)` (or `HT_STORIES`).
+  - `lot_area` = polygon area from Property Boundaries (`PARCELID`, `STATEDAREA` [V]).
+- `cap_units = max(unit-count rule, cap_GFA / g)`.
+  - `g` is an assumed gross m² per unit; report results across a sensitivity range.
+  - The unit-count rule is `UNITS`, or `lot_area / AREA_UNITS`. From May 2023 it is also 4 units in Neighbourhoods: Council adopted by-laws 473-2023 and 474-2023 on May 10, 2023 [V: toronto.ca Multiplex 2–4 study page].
+  - From June 25–26, 2025 it is 6 units in Toronto & East York District and Ward 23 (by-laws 653-2025 and 654-2025) [V: toronto.ca/multiplex].
 
-**Not captured by the layers.**
-- Chapter 900 site-specific exceptions can override FSI and height. Only the exception reference is in the layer [S: https://www.toronto.ca/legdocs/bylaws/2013/law0569-schedule-a-vol1-ch1-800.pdf]; the text is in PDFs.
-- Holding symbols "(H)" restrict use until conditions are met [S, same source].
-- Secondary Plans and Site and Area Specific Policies (SASPs) are not zoning and have no confirmed open GIS layer (D12).
-- Minister's Zoning Orders are not in City layers (D25).
+**What the numeric fields actually cover** [C: `spatial.py`]:
+- `FSI_TOTAL>0` in only 24.1% of zoning polygons;
+- `DENSITY>0` in 18.7%;
+- `UNITS>0` in 5.6%;
+- `COVERAGE>0` in 0%.
 
-**Recommendation.** Flag lots with an exception, holding symbol or MZO, and either exclude them from capacity estimates or hand-code them.
+Most low-rise residential zones have no numeric FSI. For them, capacity has to come from the envelope (height and coverage overlays plus the setbacks in the by-law text), or from the unit-count rule.
+
+**Existing built measure.**
+- 3D Massing footprints with `AVG_HEIGHT`/`MAX_HEIGHT` [V, 2025 file], giving `built_GFA ≈ footprint × floor(AVG_HEIGHT / 3.0 m)`.
+- The Building Outlines layer adds `DERIVED_HEIGHT` [V].
+- There are annual 3D Massing vintages for 2016–2023 and 2025 (no 2024) [V]. Change in built form can therefore be measured over time.
+- Existing units are not in any open building layer. Use 2021 Census dwellings at dissemination-area level, which I could not open here (UNVERIFIED). MPAC holds copyright on assessment data [V: 3D Massing record].
+
+**Exceptions break the simple calculation.**
+- 75.5% of Zoning Area polygons carry a Chapter 900 exception (`ZN_EXCPTN=Y`). So do 73% of single-unit and 49% of 50+ unit new-building permit sites [C].
+- Exceptions can override FSI and height, so capacity read from the layer attributes is an upper or lower bound only.
+- In Phase 2, parse each exception's numeric overrides (GFA, height, units) from the Chapter 900 text. I parsed 5,247 exceptions programmatically [C], so this is possible.
 
 ### 1.2 As-of-right vs. rezoning vs. minor variance
-For each permit-project (§1.3), search for planning applications on the same parcel, either within 10 years before the project's first `APPLICATION_DATE` or ending in that window.
+Classify each permit-project (§1.3) by the planning files at the same address within a lookback window (10 years before first `APPLICATION_DATE`, ending before `ISSUED_DATE`).
 
-| Class | Rule (data fields) |
+| Class | Rule |
 |---|---|
-| **Rezoning** | Linked to a Development Applications record of type OZ (Official Plan / Zoning By-law Amendment) [S: type codes per https://github.com/Planning-Toronto/alternative-application-information-centre, [G]] |
-| **Minor variance** | No OZ, but linked to a Committee of Adjustment MV record (D05) |
-| **As-of-right** | No OZ or MV link. Site Plan (SA), subdivision (SB), part-lot (PL) or condo (CD) links do not change zoning, so the project stays as-of-right but is flagged as "site-plan controlled". |
+| Rezoning | Development Applications `APPLICATION_TYPE='OZ'` at the same normalized address (`STREET_NUM`/`STREET_NAME`/`STREET_TYPE`/`STREET_DIRECTION`) or spatial match |
+| Minor variance | No OZ; Committee of Adjustment `APPLICATION_TYPE='MV'` with `C_OF_A_DESCISION` approved |
+| As-of-right | Neither. SA (site plan), SB, PL or CD links do not change zoning. |
 
-- **Selection bias.** Rezoning applications are selected on zoning being non-binding in the developer's favour. Each class must therefore be reported separately and never pooled when relating zoning to activity.
-- **Cross-check for rezonings.** For rezoning projects, the relevant "zoning" is (a) the pre-application zoning and (b) the approved site-specific by-law. Source (b) from the by-law archive (D09) or the Chapter 900 exception number.
-- **Linkage is spatial.** A planning-application number field in the permit data was not found [G: 32-column dictionary, https://raw.githubusercontent.com/Mahmoud-O/toronto-building-permits/main/docs/data_dictionary.md], so the link must be made spatially. The match rate is unknown until it is measured.
+**Feasibility evidence** (new-residential permit projects, applications 2018–2025, address match without a date window) [C: `link.py`]:
+
+| Size | MV-linked | OZ-linked | No link |
+|---|---|---|---|
+| 1 unit | 79% | 4% | 17% |
+| 2–4 units | 72% | 4% | 24% |
+| 5–49 units | 17% | 64% | 20% |
+| 50+ units | 9% | 87% | 5% |
+
+These shares are upper bounds, because there is no date window and an address can have unrelated past files.
+
+Three things follow:
+- Truly as-of-right new construction is a minority in every size class.
+- Large projects are almost all rezonings. The selection bias in the brief is severe: applications are concentrated where zoning does not permit the project.
+- Analyses must be split by class and size.
 
 ### 1.3 Project (aggregating permits)
-1. Union Cleared (D01, D02) and Active (D03) permits.
-   - Deduplicate on `PERMIT_NUM` + `REVISION_NUM` + `PERMIT_TYPE`. A third party found the first two alone left 5,065 duplicates, and adding the third cut that to 24 [G: https://github.com/paramsngh/toronto-building-permits].
-   - Keep the latest revision.
-2. Build a permit-stream key from `PERMIT_NUM` minus its trailing sub-type code. The year + application-number stem is a third-party inference [G].
-3. Drop trade and secondary permits (plumbing, HVAC, drain, fire) when a main building permit exists on the stream. Drop partial and conditional permits as duplicates. A third party removed 270,998 secondary duplicates this way [G].
-4. Merge streams into a project when they share `GEO_ID` (or a normalized address) and their activity windows overlap within 24 months. This catches separate shoring, foundation and above-grade permits.
-5. Set project attributes:
-   - units = max `DWELLING_UNITS_CREATED` across the New Building / main permits (max, not sum);
-   - first application = min `APPLICATION_DATE`;
-   - first issue = min `ISSUED_DATE`;
-   - project clearance = max `COMPLETED_DATE` among the main permits.
-6. For Planning-Act projects, overwrite the project ID with the Development Pipeline `Application Number` where a spatial match exists [G: https://raw.githubusercontent.com/Nshipyard/toronto-development-pipeline/main/scripts/build_pipeline.py].
+The permit number is the key [V field note: "Last two digits of calendar year, plus IBMS-generated sequence"].
 
-Validation: hand-check a stratified sample of 100 projects against AIC and permit descriptions.
+1. **Use the folder stem.** The first two tokens of `PERMIT_NUM` (e.g. `05 196217`) form a permit folder. Every component shares it [C: `profile2.py`]:
+   - building: `BLD`, or `B01…Bnn` for subdivision houses;
+   - partial permits: `FND` (foundation), `SHO` (shoring), `STR` (structure);
+   - trade permits: `PLB`, `HVA`, `DRN`;
+   - demolition: `DEM`.
+2. **Deduplicate on `PERMIT_NUM`+`REVISION_NUM`+`PERMIT_TYPE`.** These three are unique for 1,096,036 of 1,096,236 rows [C]. Revisions keep the same `PERMIT_NUM`.
+3. **Units per building permit** = max `DWELLING_UNITS_CREATED` across revisions.
+   - Units per folder = the sum over building permits (`BLD` and each `Bnn`).
+   - Drop trade, partial and conditional permits from unit counts.
+   - Drop obvious errors: one record has 100,000 units; 11 values are negative [C].
+4. **Merge folders into a project** when they share `GEO_ID` (or a normalized address) and their activity overlaps within 36 months. This catches separate shoring and above-grade folders and phased towers.
+5. **Planning-Act projects:** attach the Development Pipeline `Application Number`. It matches Development Applications `APPLICATION#` for 96.9% of Pipeline projects. 98% of "Built" projects have an exact address match to some permit [C].
+
+Validate against a hand-checked sample before Phase 2 analysis.
 
 ### 1.4 Completion
-| Measure | Source and field | What it is | Geography |
-|---|---|---|---|
-| **CMHC completion** | Starts & Completions Survey (D20, D21) | Site-visit confirmed. A unit "may be counted as completed" with up to 10% of work remaining [S: CMHC methodology URL in D21]. Gross new units only. | CSD/CMA; census tracts listed as a portal geography [S], post-2023 availability UNVERIFIED |
-| **City "Built"** | Development Pipeline `'Pipeline Status' = 'Built'` (D06) | "Ready for occupancy and/or completed" [S: 2020 pipeline PDF] | Project point |
-| **Permit cleared** | `COMPLETED_DATE` / `STATUS` in Cleared Permits (D01) | Administrative closure of the permit file. It can lag occupancy by years and can occur without construction [R]. **Not a completion measure.** | Address |
-| **Net stock change** | Census `Total private dwellings` (D22) | Net of demolitions and conversions | DA/CT, every 5 years |
 
-**Reconciliation plan.**
-- Compare annual totals of each measure for 2017–2025 at city level, and by CT where CMHC allows.
-- City dashboards already report completions as "reported by CMHC" [S: https://www.toronto.ca/wp-content/uploads/2025/06/904a-city-planning-municipal-housing-target-dashboard.pdf]. The City itself treats CMHC as the authoritative completions count.
-- Primary measure: CMHC completions. Secondary measure: City "Built" for project-level timing.
+| Measure | Field / source | Definition | Geography and years | Use |
+|---|---|---|---|---|
+| **CMHC completion** | HMIP 1.1.2.11 (CT), 1.2.2 (CSD) | "all the proposed construction work … has been performed … up to 10% … may remain" [V: CMHC methodology] | **CT 2010–2022 only.** 2023+ exports say "This data series is now archived" [V]. City of Toronto total 1998–2025 [V] | Primary |
+| **City Pipeline "Built"** | `Pipeline Status='Built'` | "Projects that became ready for occupancy and/or were completed" [V: 2025 bulletin] | Project/address; **no built date**; rolling 5-year window | Project-level outcome, Planning-Act projects ≥ Site Plan threshold only |
+| **Permit cleared** | `COMPLETED_DATE` ("Date work is complete and permit is cleared"), `STATUS='Closed'` | Administrative closure | Address; 2001–2026, **no 2007 clearances** [C] | **Not a completion measure** |
+| **Net stock** | Census dwellings | Net of demolitions and conversions | DA/CT, 5-yearly | Net-unit check (UNVERIFIED, StatCan blocked) |
+
+**Reconciliation** [C: `reconcile.py`]:
+- **Census tracts vs. city total.** Tracts 0001–0399 sum to 16,292 completions in 2022, vs. 16,296 for the Toronto CSD. The tract file reproduces the city total.
+- **Cleared permits vs. CMHC.** Units on cleared New Building permits equal only **22–62% of CMHC completions** in each year 2002–2024 (correlation 0.23). In 2025 they jump to 22,359 against CMHC's 14,753, which suggests a batch closure. Only 48% of 50+ unit permits issued 2010–2018 have cleared.
+- **Permits issued vs. CMHC starts.** Units on issued permits run 0.5–1.5× CMHC starts each year (correlation 0.40). They track starts better than clearance tracks completions.
+- **Pipeline "Built" vs. CMHC.** "Built" sums to 124,326 units, against 95,701 CMHC completions in the City over 2021–2025. Pipeline "Built" is *higher*, even though it excludes small projects. The definitions differ: "ready for occupancy and/or completed", and proposed rather than as-built unit counts. The two cannot be used interchangeably.
 
 ---
 
-## 2. Verification items
+## 2. Verification results
 
-| Item | Finding | Status |
-|---|---|---|
-| Zoning in force at application date | The open Zoning By-law layer is a current snapshot. A catalogue copy says amendments run "up to June 18th, 2023" [S: https://data.urbandatacentre.ca/catalogue/city-toronto-zoning-by-law]. A 2014 vintage exists ("current as of September 15, 2014") [S: https://library.torontomu.ca/gmdc/2014/10/02/toronto-zoning-shapefiles-available/]. No version history was found. Amending by-laws with numbers and dates are in the by-law archive (D09) and the per-chapter amendment pages (D08). | Partially reconstructable (see §3 Q1) |
-| Did 569-2013 fully replace pre-amalgamation by-laws? | **No.** It was enacted 2013-05-09 and appealed under s.34(19) [S: https://www.toronto.ca/city-government/planning-development/zoning-by-law-preliminary-zoning-reviews/zoning-by-law-569-2013/]. "Nothing in this By-law repeals the provisions of the Former General Zoning By-laws"; it supersedes them only where it applies. Lands hatched on the Section 990.10 map stay under former by-laws [S: https://www.toronto.ca/legdocs/bylaws/2013/law0569-schedule-a-vol1-ch1-800.pdf]. "Some regulations … remain under appeal with the Ontario Land Tribunal" under PL130592 / OLT-22-002465 [S: https://www.toronto.ca/city-government/planning-development/zoning-by-law-preliminary-zoning-reviews/zoning-by-law-569-2013-2/omb-decisions/]. | [S] |
-| Exceptions, holding, Secondary Plans, MZOs in open data | Exceptions: Chapter 900, referenced by "x" numbers on the map; text only in PDFs. Holding: "(H)" before the zone symbol [S, same PDF]. The exception and holding attribute names in the GIS layer are **UNVERIFIED**. Secondary Plans/SASPs: no open GIS layer found, only Official Plan PDFs [S: D12]. MZOs: published as O. Regs / ERO notices, for example O. Reg. 561/24 (65 Rexdale Blvd) and Zoning Order 005-2026 (1875 Steeles Ave W) [S: D25]. Not found in City layers. | [S]; attribute names UNVERIFIED |
-| OLT role and appeal data | OLT Case Status shows active cases plus cases closed within the last 2 years. Decisions are online for 10 years and also on CanLII [S: https://olt.gov.on.ca/case-status]. **No open bulk appeal dataset was found.** Bill 23 and Bill 185 (royal assent 2024-06-06 [S: Aird & Berlis summary]) narrowed third-party appeals [S, secondary]. CoA appeals in Toronto go to TLAB [S, secondary; start date UNVERIFIED]. | Appeal data not open as a dataset |
-| Gross vs. net; units vs. buildings | `DWELLING_UNITS_LOST` "rarely filled in" [G]. CMHC counts gross new units on new foundations [S: D21]. The Census measures net stock. Permits record units per permit, not per building, so the project roll-up in §1.3 is needed. | [G]/[S] |
-| Boundary and definition changes | Ward boundaries changed to 25 wards in 2018 [R]. Neighbourhoods moved from 140 to 158 [R]. CMHC geographies are redefined every 5 years, and completions have been collected only in CMAs since 2023-01-01 [S: D21]. The pipeline uses a rolling 5-year window, and edition totals are not comparable: 854,898 units in 2024 vs. ~791,000 in 2025, despite a stated "+7%" [S: 2024/2025 bulletins]. | Mixed |
+### Zoning in force at application date
+**Finding:** partially reconstructable.
+- The open GIS layer is a single snapshot: "updated to include amendments up to June 18th, 2023" [V CKAN].
+- The legal office consolidation is newer: "Version Date: July 31, 2024, including City-wide Amendments up to April 30, 2026" [V].
+- Past versions:
+  - Wayback Machine captures of the CKAN files on 2023-04-04 and 2024-06-05 [V, CDX index];
+  - a 2014 vintage is reported in a library notice (UNVERIFIED).
+- Chapter 900 exceptions cite their amending by-laws: 1,443 of 5,247 (27.5%) cite a "By-law: NNNN-YYYY", with latest-cited years 2014–2026 [C]. Site-specific changes after 2013 can therefore be dated, to the year from the citation and to the day from the by-law archive.
 
-**Policy time markers.**
+### Did 569-2013 fully replace the pre-amalgamation by-laws?
+**No** [V].
+- City: "569-2013 does not fully replace all older bylaws in every area".
+- About "1500 low-rise residential parcels … were excluded … as part of the transition protocol".
+- By-laws 206-2026 and 650-2026 are only now bringing Etobicoke-York and Scarborough low-rise lands into 569-2013, so the coverage boundary moves over time.
+- "Some regulations … remain under appeal … Case Number PL130592 / OLT-22-002465".
+- Former by-laws are hard copy or counter-only; there is no GIS.
+- In the data, 50.8% of 50+ unit and 12.7% of 1-unit new-building permit sites fall outside every 569-2013 polygon [C].
 
-| Date | Event | Source / status |
-|---|---|---|
-| 1998-01-01 | Amalgamation | [R] UNVERIFIED |
-| 2013-05-09 | 569-2013 enacted | [S] toronto.ca 569-2013 page |
-| 2014-09-15 | Earliest open 569-2013 GIS snapshot | [S] TMU GMDC |
-| 2018 / 2019-07-16 | Laneway suites (sources conflict) | UNVERIFIED |
-| 2022-02-02; 2022-07-04 | Garden suites adopted; OLT dismissed appeal, so the by-law is in force | [S] https://www.toronto.ca/news/garden-suites-permitted-in-toronto-after-ontario-land-tribunal-dismisses-appeal/ |
-| 2022-11-28 | Bill 23 royal assent | [S] legislature record via myparliament.ca and law-firm notes; one source says Nov 29; ontario.ca not opened |
-| 2023-05-10 / **2023-05-12** / 2023-06-14 | Multiplex (≤4 units): Council adoption / zoning in effect / OPA in effect | [S] https://www.toronto.ca/multiplex |
-| 2024-06-06 | Bill 185 royal assent | [S] law-firm note |
-| 2024-11-13 | As-of-right mid-rise on Avenues adopted | [S] toronto.ca Avenues study page |
-| 2025-08-15 | Province approves PMTSAs, so inclusionary zoning (By-law 941-2021) can take effect | [S] secondary |
+### Exceptions, holding provisions, Secondary Plans, MZOs in open data
+- **Exceptions:** `ZN_EXCPTN`/`EXCPTN_NO` and holding symbols `ZN_HOLDING`/`HOLDING_ID` are attributes [V readme]. There are 48 holding polygons. Exception text is only in the HTML consolidation.
+- **Secondary Plans:** a layer exists, "current as of the 2015 Plan Consolidation", with 55 polygons [V].
+- **Site and Area Specific Policies:** 868 polygons, December 2025 consolidation [V].
+- **MZOs:** listed on a City web page, about 30 orders from O. Reg. 170/20 to 2026 [V]. They are **not** in the zoning layer. "If there is a conflict … the MZO prevails" [V].
 
-**Recommended marker.** Use the **multiplex zoning in effect on 2023-05-12** as the cleanest marker.
-- It is a single citywide as-of-right change, and it affects low-rise permits directly, with no rezoning needed.
-- Garden suites (in force 2022-07-04) are a close preceding marker and must be modelled jointly.
-- Bill 23 is a poor marker, because its provisions phased in at different dates [S: Aird & Berlis "what's in force"].
+### OLT appeals: role and data
+- No open bulk dataset exists.
+- Case Status keeps cases "two years after a case is closed". Decisions are online for up to 10 years and also on CanLII [V].
+- Development Applications `STATUS` shows appeal states (`OMB Appeal`, `OMB Approved`, `Appeal Received`), but **current status only**:
+  - 20–29% of 2020–2025 rezoning (OZ) files show an appeal state;
+  - only 0–5% of 2008–2015 files do, because closure overwrites it [C].
+- Appeal incidence for older cohorts therefore needs hand-coding from OLT decisions.
+- Committee of Adjustment appeals: open TLAB dataset, 2,146 appeals since 2017-05 [V]. Committee of Adjustment records have `OMB_DESCISION` for 512 rows [C].
+- No OLT terms-of-use page was found (404). `robots.txt` disallows only `/wp-admin/`. Manual lookup is assumed; nothing was scraped.
+
+### Policy time markers (exact dates)
+- **Multiplex ≤4 units:** Council adoption 2023-05-10 [V]. The in-force date (2023-05-12) is [secondary].
+- **Garden suites:** Council 2022-02-02 [V]. In force after the OLT dismissed the appeal on 2022-07-04 [secondary]. O. Reg. 462/24 in force 2024-11-20 [V].
+- **Sixplex (TEY + Ward 23):** Council 2025-06-25/26, "now in force" [V]; in-force date UNVERIFIED.
+- **Bill 23** royal assent 2022-11-28 and **Bill 185** royal assent 2024-06-06: [secondary], UNVERIFIED from primary sources.
+
+**Signal in the data** [C]. New Building permits for 2–6 units issued per year:
+
+| Year | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 YTD |
+|---|---|---|---|---|---|---|---|---|
+| Permits | 16 | 22 | 28 | 47 | 65 | 153 | 243 | 292 |
+
+Second-suite and laneway/garden-suite permit units rose from 238 (2019) to 858 (2025). **The multiplex marker of 2023-05 is usable** for permits. It cannot be studied for completions below city level, because census-tract completions end in 2022.
+
+### Gross vs. net; units vs. buildings; definitional drift
+- **Lost units:** `DWELLING_UNITS_LOST` is filled on about 35% of rows. Among "Demolition Folder" permits, the share with lost units > 0 rose from 33% (2004) to 87% (2025) [C]. Net-unit series are biased toward recent years.
+- **Rental demolitions:** a separate dataset covers 6+ unit rental demolitions approved since 2017 (165 records) [V].
+- **CMHC counts gross new units only.** Its "Residential Conversions and Demolitions" tables exist; geography UNVERIFIED.
+- **Units vs. buildings:** permits record units per building permit, so subdivisions appear as `B01…Bnn`. Aggregate per §1.3.
+- **Drift:**
+  - wards went from 44 to 25 in Dec 2018, and neighbourhoods from 140 to 158 [V resources];
+  - the Pipeline's rolling window changes each edition. Open-data units total 927,532 vs. the bulletin's "over 791,000" [C/V];
+  - the 2000–2016 permits file uses a different date format and header case [C].
 
 ---
 
 ## 3. Feasibility gate
 
 **Q1. Can zoning be obtained as of each application date?**
-**Partially; not directly.** The open layer is a current snapshot with no version history. Three methods could recover past zoning:
-- (a) a 2014-09-15 baseline (D11);
-- (b) backcasting, by removing site-specific amending by-laws (D09) enacted after the application date;
-- (c) for OZ applications, the "existing zoning" stated in staff reports.
-
-Method (b) is feasible for the 569-2013 general provisions plus Chapter 900 exceptions, but it means manual or NLP extraction from PDFs. Lands under former by-laws and provisions under appeal cannot be backcast reliably.
-
-*Mitigation:* restrict zoned-capacity analyses to lots whose exception and zone label did not change between the application date and today. Identify those lots by the absence of any post-date amending by-law on the parcel, and report the excluded share.
+**Partially.**
+- **569-2013 lands, 2013-05-09 onward:** yes, approximately. Take the current layer (June 2023) and the consolidation (to 2024/2026), then backcast by removing exceptions whose citing by-law post-dates *t*. Check against the 2023 and 2024 Wayback copies. City-wide changes have known dates (e.g. 474-2023).
+  - Base-zone map changes that do not create an exception cannot be dated from Chapter 900 and need the by-law archive.
+- **Lands under former by-laws:** no. That is about half of large-project sites [C]. There is no GIS, and the hard copies are not open.
+- **Before 2013:** no harmonized zoning exists.
+- **Rezoning and minor-variance files:** zoning-as-of-application is partly observed directly. Committee of Adjustment `ZONING_DESIGNATION` records it [V]. For rezonings, the staff reports linked via `APPLICATION_URL` state the existing zoning (manual).
 
 **Q2. Is there a project-level link between applications and permits?**
-**Partially.**
-- The City's Development Pipeline is explicitly project-level: it "brings together Planning application and building permit data" [S: D06]. It carries `'Application Number'`, which joins to Development Applications `APPLICATION#` [G].
-- It covers only larger Planning-Act projects in a rolling 5-year window. Whether it exposes permit numbers is UNVERIFIED.
-- Permit records have no application-number field [G], so as-of-right and minor-variance projects can be linked only by address, `GEO_ID` or space. The match rate is to be measured.
+**Yes for Planning-Act projects; by address for the rest.**
+- The Development Pipeline groups applications and "downstream Building Permits" into projects [V].
+- Its `Application Number` matches Development Applications `APPLICATION#` for 96.9% of projects [C].
+- It has no permit IDs, but 98% of Built projects match a permit address [C].
+- Permits carry no application number [V schema], so other projects link by address or `GEO_ID`.
+- `GEO_ID` matches current Address Points for 88.6% of permits overall but only 69.8% of new-residential permits [C]. Supplement with address strings.
 
 **Q3. Is there a completions measure finer than the whole city?**
-**Yes, with caveats.**
-- City "Built" status per Pipeline project (point level; Planning-Act projects only) [S].
-- CMHC completions by census tract: the portal lists CT as a geography [S]. Post-2023 CT availability and suppression are UNVERIFIED.
-- Census DA/CT net dwelling change every 5 years.
-- Permit clearance is not a completion measure.
+**Yes, but only to 2022.**
+- CMHC completions by census tract cover **2010–2022**, are archived after that, and reconcile with the city total [C/V].
+- Starts by census tract continue through 2025 [V].
+- Pipeline "Built" is project-level but undated, and limited to Planning-Act projects.
 
-**Q4. How many years have consistent coverage across all four stages?**
-Best estimate from unverified coverage:
+**Q4. Years with consistent coverage across all four stages; recommended period.**
 
 | Stage | Coverage |
 |---|---|
-| Permits | 2001–present [G: mirrored metadata "from 2001 onwards"] |
-| Zoning (569-2013, GIS) | Snapshot from 2014-09-15 [S] |
-| Development applications | ~10 years for OZ/SA, ~5 years for MV/CO in third-party tools [G]; true start UNVERIFIED |
-| Pipeline | Rolling 5 years (2021–2025 in the current edition); earlier editions as PDFs [S] |
-| CMHC completions | Long series [S] |
+| Applications | Rezoning/site plan 2008-01 → [V]; Committee of Adjustment 2001 → [V]; TLAB 2017-05 → [V] |
+| Approval / appeal | Current status only; no dates |
+| Zoning | 569-2013 from 2013-05-09 (layer as of 2023-06) |
+| Permits | Reliable from ~2002. Units on issued permits are <10% of CMHC starts before 2002 [C]; no 2007 clearances |
+| Completions by tract | 2010–2022 |
 
-The binding constraints are zoning (2014+), application coverage (about 2016+ if 10 years) and completions lag. High-rise projects take several years from application to completion [R].
+**The overlap of all four stages at sub-city level is 2013-05 to 2022-12, about 9.5 years.**
 
-**Recommended study period:**
-- **Application cohorts 2016–2020**, with outcomes observed through **2025-12-31**. This allows at least 5 years of follow-up for completion and attrition.
-- **Low-rise / as-of-right permits 2019-05 to 2026-09**, for the pre/post multiplex descriptive comparison: 4 years before and about 3.4 years after 2023-05-12.
+Recommended design:
+1. **Primary period:** application/permit cohorts **2013-05-09 to 2017-12-31**, with outcomes (permit issuance, CMHC starts and completions by tract) observed through **2022-12-31**. That gives at least 5 years for completion; the median time from application to issue for 50+ unit permits is 2.1 years, then 2.9 years to clearance [C].
+2. **Extension:** for 2018–2025 cohorts, stop the outcome at *permit issued* and *CMHC start by tract*, which runs through 2025.
+3. **Marker study:** an as-of-right low-rise window **2019-05 to 2026-09** around 2023-05-10, using permits and starts only.
 
-*Justification:* this is the latest window where zoning (2014 baseline + amendments), applications and permits are all in open data, and where most cohorts have had time to complete. Confirm the start year once D04 is downloaded.
-
-**Q5. What is the finest reliable unit of analysis?**
-**Census tract (2021 boundaries)** for analyses covering all four stages including completions. **Parcel / project** for application → approval → permit timing and attrition, and for the Pipeline subset's completions. Wards are too coarse and changed in 2018 [R].
+**Q5. Finest reliable unit of analysis.**
+- **Address/parcel** for application → approval → permit timing and attrition.
+- **2021 census tract** for anything involving completions (2010–2022) or starts (to 2025).
+- Wards are too coarse and were redrawn in 2018.
 
 ---
 
-## 4. Verdict: **GO WITH LIMITS (provisional)**
+## 4. Verdict: **GO WITH LIMITS**
 
-The verdict is provisional: no primary source was opened. It becomes final only after the checklist in summary.md passes with network access.
+1. **Zoning history.** Zoning-as-of-date is reconstructable only for 569-2013 lands from 2013 onward, by backcasting. Former-by-law lands are excluded or hand-coded; they hold about half of large-project sites. Report the excluded share in every table.
+2. **Completions below city level end in 2022.** Post-2022 analysis uses starts by tract or project-level Pipeline "Built" (undated). Permit clearance is never used as completion.
+3. **Appeals cannot be measured from open data for older cohorts.** The appeal analysis is a hand-coded sample of OLT decisions, done by manual lookup.
+4. **Selection.** Rezoning, minor variance and as-of-right are reported separately. As-of-right new construction is a minority in every size class.
+5. **Net units.** Demolition-unit capture improves over time, so net series must be flagged or restricted to recent years. The 2026 Census will provide a net check (counts due 2027, UNVERIFIED).
+6. **Built form.** Built GFA and existing units are estimated from massing heights and the Census.
 
-Limits:
-1. **No true as-of-date zoning.** Use the backcast or "stable-zoning lots" restriction and report the excluded share. Results on lots with exceptions, holding symbols, MZOs or former by-laws are excluded or hand-coded.
-2. **Application → permit linkage is spatial**, except for Pipeline projects. Report match rates, and treat unmatched permits as "as-of-right (presumed)".
-3. **Completions.**
-   - CMHC completions at CT are the primary measure.
-   - Project-level "Built" applies only to Planning-Act projects.
-   - Permit clearance must not be used as completion.
-4. **Net units.**
-   - Permit `DWELLING_UNITS_LOST` is unreliable.
-   - Net change comes from linked demolition permits plus the Census (2021→2026; 2026 counts due 2027-02-10 [S: https://www.statcan.gc.ca/sites/default/files/documents/2026-09/census-2026-key-content-release-schedule.pdf]).
-5. **Appeals (OLT) have no open dataset.** Appeal status and timing can only be observed for a hand-coded sample from OLT decisions, collected by manual lookup rather than scraping until terms are checked.
-6. **Built-form data has no GFA or unit counts.** Unused capacity is approximated from 3D Massing heights.
-
-**Fallback if the checks fail** (for example, the development applications history is short or the CT completions are suppressed):
-
-> Use a citywide plus CT-level descriptive time series around the 2023-05-12 multiplex marker, limited to as-of-right low-rise permits (permits → CMHC completions). Add a parcel-level Pipeline cohort study (application → Built) without zoning-capacity terms.
+**Fallback if Phase 2 finds the backcast unreliable:** drop as-of-date capacity. Run (a) a Pipeline cohort study of attrition and stage reached, by Official Plan designation, Secondary Plan or SASP, and (b) a census-tract panel (2010–2022 completions; 2010–2025 starts) on current zoning, with exposure measured only for tracts whose exceptions have no post-2013 amendments.
