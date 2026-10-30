@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 2 pipeline</title>
+<meta name="description" content="Phase 2: code for following Toronto projects from zoning to application, permit and completion. Tested on synthetic data only.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="toronto.html">Toronto feasibility</a></li>
+    <li><a href="sources.html">Data sources</a></li>
+    <li><a href="pipeline.html" aria-current="page">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html">Glossary</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main">
+  <p class="kicker">Phase 2 · Toronto · code</p>
+  <h1>A pipeline for following projects from zoning to finished homes</h1>
+  <p><span class="badge code">Code only, synthetic data</span></p>
+  <p class="lede">Phase 2 is the analysis code that would carry out the study Phase 1 found feasible. It is written and tested, but it has never been run on real data.</p>
+
+  <div class="callout scope prose">
+    <strong>What this is, and is not</strong>
+    <p id="intro"></p>
+    <p>So there are no results about Toronto here: only a description of how the analysis is built and what it still needs.</p>
+  </div>
+
+  <section aria-labelledby="diag-h">
+    <h2 id="diag-h">The four steps, and the code for each</h2>
+    <p class="prose">A housing project moves through four steps. Each code module handles one step, or works across all of them. Module descriptions are quoted from the Phase 2 README; which step each sits under is this site's reading of those descriptions.</p>
+    <div class="pipeline" id="pipeline" role="list"></div>
+    <div class="across" id="across"></div>
+    <p class="prov" data-prov="phase2:phase2/README.md"></p>
+  </section>
+
+  <section aria-labelledby="design-h">
+    <h2 id="design-h">Key design decisions</h2>
+    <p class="prose">Four choices that most affect what the results will mean. Plain-language summary first; open each for the README's wording.</p>
+    <div id="design"></div>
+    <p class="prov" data-prov="phase2:phase2/README.md"></p>
+  </section>
+
+  <section aria-labelledby="lim-h">
+    <h2 id="lim-h">Known limitations</h2>
+    <p class="prose">From the Phase 2 README, as written. Several push the completion rate in a known direction, too low or too high, which is why they are listed.</p>
+    <div class="prose" id="limitations"></div>
+    <p class="prov" data-prov="phase2:phase2/README.md"></p>
+  </section>
+
+  <section aria-labelledby="blocked-h">
+    <h2 id="blocked-h">What is blocked until real data is loaded</h2>
+    <div class="prose">
+      <p>The data loaders are deliberately left unfilled until field names are confirmed from verified data dictionaries. These next steps all need real data:</p>
+      <div id="next"></div>
+      <h3 style="margin-top:22px">Assumptions to replace with evidence</h3>
+      <p>The settings in <code>pipeline/config.py</code> are placeholders marked ASSUMPTION, not findings:</p>
+      <p id="assumptions"></p>
+    </div>
+    <p class="prov" data-prov="phase2:phase2/README.md,phase2/pipeline/config.py"></p>
+  </section>
+
+  <section aria-labelledby="test-h">
+    <h2 id="test-h">How the code was checked</h2>
+    <div class="prose">
+      <p>Two audits are logged. They check that the code is correct on <a class="term" data-term="synthetic">synthetic</a> data; they cannot check that its assumptions hold for Toronto.</p>
+      <div class="unverified" style="margin-bottom:16px"><p id="not-covered"></p></div>
+      <details class="acc">
+        <summary><span class="num">1</span><span class="head">Audit 1: code review. Bugs found and fixed</span></summary>
+        <div class="body" id="audit1"></div>
+      </details>
+      <details class="acc">
+        <summary><span class="num">2</span><span class="head">Audit 2: empirical checks, including <a class="term" data-term="mutation-check">mutation checks</a></span></summary>
+        <div class="body" id="audit2"></div>
+      </details>
+    </div>
+    <p class="prov" data-prov="phase2:phase2/AUDIT_LOG.md"></p>
+  </section>
+
+  <section aria-labelledby="code-h">
+    <h2 id="code-h">Read the code</h2>
+    <ul class="prose" id="code-links"></ul>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches. <a href="about.html">Sources and commits</a>.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/pipeline.js"></script>
+</body>
+</html>

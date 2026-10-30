@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data sources explorer</title>
+<meta name="description" content="The 30 data sources reviewed in the Toronto feasibility study, searchable and filterable.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="toronto.html">Toronto feasibility</a></li>
+    <li><a href="sources.html" aria-current="page">Data sources</a></li>
+    <li><a href="pipeline.html">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html">Glossary</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main" class="wide">
+  <p class="kicker">Phase 1 · Toronto · inventory</p>
+  <h1>Data sources explorer</h1>
+  <p class="lede">The 30 sources the Toronto feasibility study looked at: what each holds, what years and places it covers, its weaknesses, and how it links to the others.</p>
+  <div class="callout scope prose">
+    <strong>How to read this</strong>
+    <p>This is the study's inventory, copied as written. The "Checked" column shows whether the study actually opened and verified the source. Rows marked "Not fully verified" were not opened, or only partly (a landing page, an index listing), or rest on what the study recalled or saw in a search snippet; their details may be wrong. The Provenance line in each row's details gives the exact status. Click "Details" on a row for limitations, join keys, provenance and links.</p>
+  </div>
+
+  <form class="controls" role="search" onsubmit="return false">
+    <label class="grow">Search all fields
+      <input type="search" id="q" placeholder="e.g. completions, GEO_ID, 2022" autocomplete="off">
+    </label>
+    <label>Publisher
+      <select id="f-pub"><option value="">All publishers</option></select>
+    </label>
+    <label>Checked
+      <select id="f-prov"><option value="">All</option></select>
+    </label>
+    <button type="button" id="reset">Reset</button>
+  </form>
+  <p class="result-count" id="count" aria-live="polite"></p>
+  <div class="table-scroll">
+    <table id="sources-table">
+      <thead><tr>
+        <th scope="col" aria-sort="ascending"><button type="button" data-sort="id">ID <span class="arrow" aria-hidden="true">▲</span></button></th>
+        <th scope="col" aria-sort="none"><button type="button" data-sort="dataset">Dataset <span class="arrow" aria-hidden="true"></span></button></th>
+        <th scope="col" aria-sort="none"><button type="button" data-sort="publisher">Publisher <span class="arrow" aria-hidden="true"></span></button></th>
+        <th scope="col">Years covered (as written)</th>
+        <th scope="col" aria-sort="none"><button type="button" data-sort="provenance_group">Checked <span class="arrow" aria-hidden="true"></span></button></th>
+        <th scope="col"><span class="skip">Details</span></th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
+  <p class="small muted" style="margin-top:12px">The publisher filter groups the free-text publisher field by organisation (for example "City of Toronto - City Planning" under "City of Toronto"; "CMHC" under its full name). Coverage years are free text in the inventory, so there is no year filter; search for a year instead.</p>
+  <p class="prov" data-prov="phase1:phase1/inventory.csv"></p>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches. <a href="about.html">Sources and commits</a>.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/sources.js"></script>
+</body>
+</html>

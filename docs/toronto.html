@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toronto feasibility study</title>
+<meta name="description" content="Phase 1: can Toronto's open data support a study of zoning and housing completions? Verdict GO WITH LIMITS.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="toronto.html" aria-current="page">Toronto feasibility</a></li>
+    <li><a href="sources.html">Data sources</a></li>
+    <li><a href="pipeline.html">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html">Glossary</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main">
+  <p class="kicker">Phase 1 · Toronto</p>
+  <h1>Can Toronto's public data show how zoning relates to new housing?</h1>
+  <p><span class="badge study">Study complete (with limits)</span></p>
+  <div class="verdict" id="verdict">GO WITH LIMITS</div>
+  <p class="lede">Yes, a study is possible, but only for certain years, certain parts of the city and certain kinds of project. Eight limits shape what it can say.</p>
+
+  <div class="callout scope prose">
+    <strong>What this is, and is not</strong>
+    <p>A <em>feasibility study</em>: it checks whether the data needed to follow projects from zoning to <a class="term" data-term="completion">completed</a> homes exists, links up and covers enough years. It does <strong>not</strong> say whether zoning helps or hinders housing in Toronto. In the source's words: <q id="prepared-note"></q></p>
+  </div>
+
+  <section aria-labelledby="gate-h">
+    <h2 id="gate-h">The four questions it had to answer</h2>
+    <div class="table-scroll prose" style="max-width:860px">
+      <table>
+        <thead><tr><th scope="col">Question</th><th scope="col">Answer in the study</th></tr></thead>
+        <tbody id="gate-body"></tbody>
+      </table>
+    </div>
+    <p class="prov" data-prov="phase1:phase1/feasibility.md"></p>
+  </section>
+
+  <section aria-labelledby="cov-h">
+    <h2 id="cov-h">Which years the data covers</h2>
+    <p class="prose">Each stage of a project shows up in a different dataset, starting in a different year. A study that follows projects all the way through needs every stage at once. Shaded: the window where all four overlap below city level.</p>
+    <figure class="chart timeline" aria-labelledby="cov-cap">
+      <p class="takeaway" id="overlap-text"></p>
+      <div class="tl-wrap" id="timeline" role="img" aria-describedby="cov-cap"></div>
+      <figcaption class="chart-note" id="cov-cap">Bars start at the first year the study reports for each source; a fading end means the source continues to the present. Approval and appeal outcomes have no bar because the open data keeps only each file's current status, with no dates. The same information is in the table below.</figcaption>
+    </figure>
+    <details class="acc" style="max-width:860px">
+      <summary><span class="num">≡</span><span class="head">Coverage as a table</span></summary>
+      <div class="body" style="padding-left:0">
+        <div class="table-scroll"><table><thead><tr><th scope="col">Stage</th><th scope="col">Coverage (source wording)</th></tr></thead><tbody id="cov-body"></tbody></table></div>
+      </div>
+    </details>
+    <p class="prov" data-prov="phase1:phase1/feasibility.md"></p>
+  </section>
+
+  <section aria-labelledby="lim-h">
+    <h2 id="lim-h">The eight limits</h2>
+    <p class="prose">Each one in plain words, with the study's own wording and what the plan does about it when you open it.</p>
+    <div id="limitations"></div>
+    <p class="prov" data-prov="phase1:phase1/summary.md,phase1/feasibility.md"></p>
+  </section>
+
+  <section aria-labelledby="frame-h">
+    <h2 id="frame-h">The recommended study frame</h2>
+    <p class="prose">What the study proposes Phase 2 should look at. It is a recommendation for Phase 2 to confirm, not a result.</p>
+    <div class="two-col">
+      <div>
+        <h3>Period</h3>
+        <ul id="frame-period"></ul>
+      </div>
+      <div>
+        <h3>Unit of analysis</h3>
+        <p id="frame-unit"></p>
+        <p class="small muted">In plain words: individual addresses or <a class="term" data-term="parcel">parcels</a> to measure how long projects take and how many drop out; <a class="term" data-term="census-tract">census tracts</a> for anything involving completed homes.</p>
+      </div>
+    </div>
+
+    <figure class="chart" style="margin-top:28px" aria-labelledby="mx-title">
+      <h3 id="mx-title">Permits for new 2–6 unit buildings: 47 in 2022, 243 in 2025</h3>
+      <p class="takeaway">New Building permits for 2–6 units issued per year in Toronto. The study uses this rise as the sign that the May 2023 <a class="term" data-term="multiplex">multiplex</a> policy date is a usable marker <em>for permits</em>. It does not test whether the policy caused the rise, and the marker cannot be studied for completions below city level, because census-tract completions end in 2022.</p>
+      <div id="mx-chart" role="img" aria-describedby="mx-note"></div>
+      <p class="chart-note" id="mx-note"></p>
+    </figure>
+    <p class="prov" data-prov="phase1:phase1/summary.md,phase1/feasibility.md"></p>
+  </section>
+
+  <section aria-labelledby="unv-h">
+    <h2 id="unv-h">Still unverified</h2>
+    <div class="unverified prose">
+      <p><span class="tag-unverified">Unverified</span>These items could not be confirmed from a primary source. For several, the Statistics Canada and Ontario legislature sites refused access or loaded their content by script, so the study could not read them. Treat them as unconfirmed. They are kept apart from the verified facts above on purpose.</p>
+      <ul id="unverified-list"></ul>
+    </div>
+    <p class="prov" data-prov="phase1:phase1/summary.md"></p>
+  </section>
+
+  <section aria-labelledby="corr-h">
+    <h2 id="corr-h">Corrections made along the way</h2>
+    <p class="prose">The study was run twice: once without network access and again with it. The second pass corrected these points from the first. They are mostly field names, useful mainly to whoever runs Phase 2.</p>
+    <details class="acc prose">
+      <summary><span class="num">5</span><span class="head">Show the corrections</span></summary>
+      <div class="body" id="corrections"></div>
+    </details>
+  </section>
+
+  <section aria-labelledby="full-h">
+    <h2 id="full-h">Read the full study</h2>
+    <ul class="prose" id="full-links"></ul>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches. <a href="about.html">Sources and commits</a>.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/toronto.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hamilton parcel zoning</title>
+<meta name="description" content="The zone in force on every Hamilton property parcel, from the City's public maps downloaded 2026-10-30.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="toronto.html">Toronto feasibility</a></li>
+    <li><a href="sources.html">Data sources</a></li>
+    <li><a href="pipeline.html">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html" aria-current="page">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html">Glossary</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main">
+  <p class="kicker">Hamilton · parcel zoning</p>
+  <h1>Which zone is every Hamilton parcel in?</h1>
+  <p><span class="badge output">Output produced, not yet interpreted</span></p>
+  <p class="lede">The City of Hamilton's parcel map was laid over its zoning map to record the zone in force on each property <a class="term" data-term="parcel">parcel</a>. The result is a city-wide table, a web map and the counts below.</p>
+
+  <div class="callout scope prose">
+    <strong>What this is, and is not</strong>
+    <p>A map-overlay result from the City's public layers as downloaded on <span id="dl-date"></span>. The source calls it "a research dataset, not a zoning confirmation: the City's legal by-law text governs." It is a single snapshot with no history, and it has not yet been used to answer any question about housing or policy. The counts are of parcel records, not land area.</p>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <section aria-labelledby="val-h">
+    <h2 id="val-h">Was the match done right?</h2>
+    <div class="prose">
+      <p>A validation script took a random sample of parcels, asked the City's own live zoning service which zone sits under a point inside each one, and compared the answer with the overlay.</p>
+      <ul id="validation"></ul>
+      <p class="small muted">Source wording: "This confirms the projection and join are right. It does not check the City's layer against the legal by-law."</p>
+    </div>
+    <p class="prov" data-prov="hamilton:hamilton/parcel_zoning/output/validation.json,hamilton/parcel_zoning/README.md"></p>
+  </section>
+
+  <section aria-labelledby="charts-h">
+    <h2 id="charts-h">The zoning picture</h2>
+    <p class="prose">Every bar counts parcel records from <code>summary.json</code>. Each chart is also a table, so screen readers can read the values.</p>
+
+    <figure class="chart" aria-labelledby="c1-t">
+      <h3 id="c1-t">More than a quarter of parcels are still under a former municipality's by-law</h3>
+      <p class="takeaway" id="c1-take"></p>
+      <ul class="legend"><li><span class="sw" aria-hidden="true"></span>City-wide By-law 05-200</li><li><span class="sw alt" aria-hidden="true"></span>A former municipality's by-law</li></ul>
+      <div id="c1"></div>
+      <p class="chart-note">Codes under the former by-laws (e.g. <code>D/S-1822</code>, <code>RM3-002</code>) are not comparable with 05-200 codes; the source suggests comparing across by-laws by category instead. "none" is the 2 parcels with no zoning polygon under them. <a class="term" data-term="former-bylaws">What are former by-laws?</a></p>
+    </figure>
+
+    <figure class="chart" aria-labelledby="c2-t">
+      <h3 id="c2-t">Most parcels are in a residential zone</h3>
+      <p class="takeaway" id="c2-take"></p>
+      <div id="c2"></div>
+      <p class="chart-note">Category is the City's own grouping, with "Low Density Residential" folded into "Residential". Parcel records are not land area: each condo unit counts separately (19,780 condo-unit rolls sit on 1,266 shared footprints), while a large farm counts once.</p>
+    </figure>
+
+    <figure class="chart" aria-labelledby="c3-t">
+      <h3 id="c3-t">R1 is by far the most common zone code</h3>
+      <p class="takeaway" id="c3-take"></p>
+      <div id="c3"></div>
+      <p><button type="button" class="rowtoggle" id="c3-more" aria-expanded="false" style="font-size:14px;padding:6px 12px">Show all 30</button></p>
+      <p class="chart-note">These are the 30 most common primary zone codes. Codes are counted as written, so the same letters can mean different things under different by-laws.</p>
+    </figure>
+
+    <figure class="chart" aria-labelledby="c4-t">
+      <h3 id="c4-t">Few parcels are split between zones</h3>
+      <p class="takeaway" id="c4-take"></p>
+      <div class="table-scroll" style="max-width:640px">
+        <table id="c4"><caption>Share of a parcel's area that lies in its main ("primary") zone, at selected points of the distribution across all parcels.</caption>
+          <thead><tr><th scope="col">Percentile of parcels</th><th scope="col" class="num">Share of area in primary zone</th></tr></thead><tbody></tbody></table>
+      </div>
+      <p class="chart-note"><a class="term" data-term="split-zoned">Split-zoned</a> means two or more zones each cover at least 5% and at least 10 m² of the parcel; smaller overlaps are treated as <a class="term" data-term="sliver">slivers</a> from the two maps being drawn separately.</p>
+    </figure>
+  </section>
+
+  <section aria-labelledby="cond-h">
+    <h2 id="cond-h">Special conditions on parcels</h2>
+    <p class="prose">Counts of parcels with each flag. These describe what the City's layers record, not what the rules say. A table rather than a chart, because the rows measure different things and one of them is easy to misread.</p>
+    <div class="table-scroll" style="max-width:900px">
+      <table id="conds"><thead><tr><th scope="col">Flag</th><th scope="col" class="num">Parcels</th><th scope="col">How to read it</th></tr></thead><tbody></tbody></table>
+    </div>
+    <p class="prov" data-prov="hamilton:hamilton/parcel_zoning/output/summary.json,hamilton/parcel_zoning/README.md"></p>
+  </section>
+
+  <section aria-labelledby="dq-h">
+    <h2 id="dq-h">Data-quality numbers, and what explains them</h2>
+    <p class="prose">Some numbers in <code>summary.json</code> look odd at first sight. Where the Hamilton README or scripts explain them, the explanation is quoted; where they don't, this page says so rather than guessing.</p>
+    <div class="table-scroll" style="max-width:1000px">
+      <table id="dq"><thead><tr><th scope="col">What</th><th scope="col" class="num">Value</th><th scope="col">Explanation in the source</th></tr></thead><tbody></tbody></table>
+    </div>
+    <p class="prov" data-prov="hamilton:hamilton/parcel_zoning/output/summary.json,hamilton/parcel_zoning/README.md,hamilton/parcel_zoning/scripts/build_parcel_zoning.py"></p>
+  </section>
+
+  <section aria-labelledby="read-h">
+    <h2 id="read-h">How to read this: caveats</h2>
+    <div class="prose">
+      <ul>
+        <li><strong>The OLT/OMB tag is not a live-appeal flag.</strong> Each common tag lines up with the city-wide by-law that introduced that zone family. It says the parent by-law was appealed, not that the parcel is under appeal today.</li>
+        <li><strong>Current snapshot only.</strong> The City's server holds no history of the zoning layer. Nine zoning polygons carry impossible dates (up to 2105).</li>
+        <li><strong>Former by-laws still govern 27% of parcels</strong>, and their codes are not comparable with 05-200 codes.</li>
+        <li><strong>Shared and doubtful shapes.</strong> Condo units share footprints; 12 rolls share one 19.5 km² polygon covering the harbour; 495 rows are flagged as suspect geometry.</li>
+        <li><strong><a class="term" data-term="exception">Exceptions</a> and <a class="term" data-term="holding">holdings</a> change what is permitted.</strong> The data shows that one applies, not what it says.</li>
+        <li><strong>Licence.</strong> The layers are published under the City's Open Data Licence according to McMaster Library's catalogue record; the City's own open-data page could not be opened to confirm it.</li>
+      </ul>
+      <h3 style="margin-top:22px">The interactive map</h3>
+      <p>The branch also holds a static web map of every parcel (<a id="map-link" href="#">hamilton/parcel_zoning/site/</a>). It is not copied into this site because its data files are large. To view it, check out branch <code>claude/nice-davinci-kpvdwk</code> and serve that folder, as its README describes:</p>
+      <pre style="overflow-x:auto;background:var(--surface-2);padding:10px 12px;border-radius:6px"><code>cd hamilton/parcel_zoning/site && python3 -m http.server 8000</code></pre>
+      <p class="small muted">Opening its <code>index.html</code> directly from disk will not load the data, according to the README.</p>
+    </div>
+    <p class="prov" data-prov="hamilton:hamilton/parcel_zoning/README.md"></p>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches. <a href="about.html">Sources and commits</a>.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+<script src="assets/hamilton.js"></script>
+</body>
+</html>

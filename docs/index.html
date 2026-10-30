@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UrbanResearch overview</title>
+<meta name="description" content="Where the UrbanResearch work stands: a Toronto feasibility study, an analysis code skeleton, and a Hamilton parcel-to-zoning match.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html" aria-current="page">Overview</a></li>
+    <li><a href="toronto.html">Toronto feasibility</a></li>
+    <li><a href="sources.html">Data sources</a></li>
+    <li><a href="pipeline.html">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html">Glossary</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main">
+  <p class="kicker">Snapshot of 2026-10-30</p>
+  <h1>Where things stand</h1>
+  <p class="lede">Early-stage work on how <a class="term" data-term="zoning-bylaw">zoning</a> relates to new housing in two Ontario cities, plus a list of ideas for later. None of it is a finished research finding yet. This page says what each piece is, what it produced, and how far to trust it.</p>
+
+  <section aria-labelledby="projects-h" style="margin-top:32px">
+    <h2 id="projects-h" class="kicker" style="font-family:var(--sans)">The three projects</h2>
+    <div class="cards">
+      <article class="card">
+        <span class="badge study" style="align-self:flex-start">Study complete (with limits)</span>
+        <h3><a href="toronto.html">Toronto feasibility study</a></h3>
+        <p>Checked whether Toronto's public data can support a study of how zoning relates to housing completions. Verdict: <strong>GO WITH LIMITS</strong>. It can, but only for some years, places and kinds of project.</p>
+        <p class="not">This is a check on the data, not a finding about Toronto's housing.</p>
+        <p class="meta">Branch <code>claude/determined-lovelace-oc32xm</code></p>
+      </article>
+      <article class="card">
+        <span class="badge code" style="align-self:flex-start">Code only, synthetic data</span>
+        <h3><a href="pipeline.html">Phase 2 analysis pipeline</a></h3>
+        <p>Code that would follow projects from zoning to application, permit and completed homes. It has been tested only on <a class="term" data-term="synthetic">synthetic</a> (made-up) data.</p>
+        <p class="not">No real Toronto data is loaded, so it says nothing about Toronto yet.</p>
+        <p class="meta">Branch <code>claude/optimistic-fermat-c1mogk</code></p>
+      </article>
+      <article class="card">
+        <span class="badge output" style="align-self:flex-start">Output produced, not yet interpreted</span>
+        <h3><a href="hamilton.html">Hamilton parcel zoning</a></h3>
+        <p>Matched each of Hamilton's 177,753 property <a class="term" data-term="parcel">parcel</a> polygons to the zone it sits in, using the City's public maps downloaded on 2026-10-30.</p>
+        <p class="not">A map-overlay result, not a policy conclusion. The City's legal by-law text governs.</p>
+        <p class="meta">Branch <code>claude/nice-davinci-kpvdwk</code></p>
+      </article>
+    </div>
+    <p class="small muted" style="margin-top:14px">Also: a list of <a href="ideas.html">ideas to try next</a> <span class="badge idea" style="margin-left:4px">Idea, unverified</span></p>
+  </section>
+
+  <section aria-labelledby="read-h">
+    <h2 id="read-h">What to read first</h2>
+    <ol class="read-first">
+      <li><a href="toronto.html"><strong>The Toronto verdict and its eight limits</strong></a>. The core of the work so far: what Toronto's data can and cannot support, and the study period it recommends.</li>
+      <li><a href="hamilton.html"><strong>Hamilton zoning charts</strong></a>. A city-wide picture of which by-law and which zones Hamilton's parcels fall under, with the caveats that come with it.</li>
+      <li><a href="pipeline.html"><strong>The Phase 2 pipeline diagram</strong></a>. How the Toronto study would be run once real data is loaded, and what is blocked until then.</li>
+      <li><a href="sources.html"><strong>The data sources explorer</strong></a>, if you want to check where a Toronto claim comes from. Unfamiliar terms are underlined with dots; hover or tab to them, or see the <a href="glossary.html">glossary</a>.</li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="fit-h">
+    <h2 id="fit-h">How the pieces fit</h2>
+    <div class="prose">
+      <p>The Toronto work runs in phases. Phase 1 asked whether the data exists to study the path from zoning to <a class="term" data-term="completion">completed</a> housing, and answered "yes, with limits". Phase 2 is the code that would carry out that study; it is written and tested but has not yet been pointed at real data.</p>
+      <p>The Hamilton parcel match is a separate piece of work on a different city. It produces a table and map of zoning by parcel; it has not been used to answer a research question yet.</p>
+      <p class="small muted">All three pieces live on unmerged work branches, not on <code>main</code>. This site copies their content as of the commits listed on the <a href="about.html">About</a> page.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches. <a href="about.html">Sources and commits</a>.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

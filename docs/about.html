@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About this site</title>
+<meta name="description" content="Where every section of the UrbanResearch overview comes from: branches, files and commits.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="toronto.html">Toronto feasibility</a></li>
+    <li><a href="sources.html">Data sources</a></li>
+    <li><a href="pipeline.html">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html">Glossary</a></li>
+    <li><a href="about.html" aria-current="page">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main">
+  <p class="kicker">About</p>
+  <h1>Where this comes from</h1>
+  <p class="lede">This site presents existing work; it adds no new findings. Every number on it is copied from a file on one of the research branches, as of the commits below.</p>
+
+  <section aria-labelledby="snap-h">
+    <h2 id="snap-h">Snapshot</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Work</th><th scope="col">Branch</th><th scope="col">Commit read</th></tr></thead>
+        <tbody id="snap"></tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:10px">Snapshot date <span id="snap-date"></span>. The branches are unmerged and may have moved on since; the commit links show exactly what was read.</p>
+  </section>
+
+  <section aria-labelledby="map-h">
+    <h2 id="map-h">Section by section</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Page / section</th><th scope="col">Comes from</th></tr></thead>
+        <tbody id="sections"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="edit-h">
+    <h2 id="edit-h">Editorial choices</h2>
+    <ul class="prose">
+      <li>Plain-language headlines (for example the eight Toronto limits and the four Phase 2 design decisions) are this site's wording. The source wording is shown with each one, and links go to the full files.</li>
+      <li>Status badges use deliberately modest labels: <span class="badge study">Study complete (with limits)</span> <span class="badge code">Code only, synthetic data</span> <span class="badge output">Output produced, not yet interpreted</span> <span class="badge idea">Idea, unverified</span>.</li>
+      <li>On the Data sources page, the publisher filter groups the free-text publisher field by organisation, and the "Checked" column groups the provenance field into "Opened and verified" and "Not fully verified". The full original text is shown in each row.</li>
+      <li>On the Phase 2 page, which step each module sits under is this site's reading of the module descriptions.</li>
+      <li>On the Ideas page, the README's phrase "the Phase 2 pipeline below" is turned into a link to the Phase 2 page.</li>
+      <li>Hamilton numbers that the source does not explain are labelled "Unexplained in the source" rather than given an explanation.</li>
+      <li>Not included: the two large Hamilton <code>.csv.gz</code> tables, the Hamilton web map and its data, the 25 individual validation mismatches, and the Phase 1 and Phase 2 code. All are linked instead.</li>
+      <li>The Hamilton README links to a step-by-step <code>LOG.md</code> one folder up; that file is not present at the commit read.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="rebuild-h">
+    <h2 id="rebuild-h">Rebuilding the data</h2>
+    <div class="prose">
+      <p>The pages read <code>docs/data/site-data.js</code>, which <code>docs/build_data.py</code> generates from the source files by running <code>git show</code> at the pinned commits. To refresh it, run these from the repository root:</p>
+      <pre style="overflow-x:auto;background:var(--surface-2);padding:10px 12px;border-radius:6px"><code>git fetch origin
+python3 docs/build_data.py            # the pinned commits
+python3 docs/build_data.py --latest   # the branches' current tips</code></pre>
+      <p>After <code>--latest</code>, update the commit list and snapshot date at the top of <code>build_data.py</code> so the record stays accurate, then re-run the checks in <code>docs/checks/</code>. Those checks compare every number shown on the site with the source files, test the internal links, and click through the interactive parts in a headless browser.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const { D } = window.Site;
+    const S = D.snapshot.sources;
+    document.getElementById("snap-date").textContent = D.snapshot.date;
+    document.getElementById("snap").innerHTML = Object.values(S).map((s) =>
+      `<tr><th scope="row">${s.title}</th><td><a href="${s.branch_url}"><code>${s.branch}</code></a></td>` +
+      `<td><a href="${s.tree}"><code>${s.sha}</code></a></td></tr>`).join("");
+    const f = (key, path) => `<a href="https://github.com/DavidSchoenholz/UrbanResearch/blob/${S[key].sha}/${path}"><code>${path}</code></a>`;
+    const rows = [
+      ["Overview", "Summaries of the pages below; no figures of its own beyond the Hamilton parcel count."],
+      ["Toronto feasibility: verdict, eight limits, frame, unverified list, corrections", f("phase1", "phase1/summary.md")],
+      ["Toronto feasibility: the four questions, coverage timeline, link-share table, multiplex permits, how the plan handles each limit, fallback", f("phase1", "phase1/feasibility.md")],
+      ["Data sources explorer", f("phase1", "phase1/inventory.csv")],
+      ["Phase 2: intro, modules, design decisions, limitations, next steps", f("phase2", "phase2/README.md")],
+      ["Phase 2: assumptions", f("phase2", "phase2/README.md") + " and " + f("phase2", "phase2/pipeline/config.py")],
+      ["Phase 2: audits", f("phase2", "phase2/AUDIT_LOG.md")],
+      ["Hamilton: stats, charts, conditions, data-quality values", f("hamilton", "hamilton/parcel_zoning/output/summary.json")],
+      ["Hamilton: validation", f("hamilton", "hamilton/parcel_zoning/output/validation.json")],
+      ["Hamilton: percentages, caveats, explanations, map instructions", f("hamilton", "hamilton/parcel_zoning/README.md") + " and " + f("hamilton", "hamilton/parcel_zoning/scripts/build_parcel_zoning.py")],
+      ["Ideas to try next", f("phase2", "README.md")],
+      ["Glossary", "Written for this site as general background."],
+    ];
+    document.getElementById("sections").innerHTML = rows.map(([a, b]) => `<tr><th scope="row" style="font-weight:400">${a}</th><td>${b}</td></tr>`).join("");
+  });
+</script>
+</body>
+</html>

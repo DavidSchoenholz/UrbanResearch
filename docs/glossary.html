@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glossary</title>
+<meta name="description" content="Plain-language definitions of planning, housing-data and statistics terms used on this site.">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner">
+  <a class="brand" href="index.html">UrbanResearch <span>overview</span></a>
+  <nav class="site-nav" aria-label="Sections"><ul>
+    <li><a href="index.html">Overview</a></li>
+    <li><a href="toronto.html">Toronto feasibility</a></li>
+    <li><a href="sources.html">Data sources</a></li>
+    <li><a href="pipeline.html">Phase 2 pipeline</a></li>
+    <li><a href="hamilton.html">Hamilton zoning</a></li>
+    <li><a href="ideas.html">Ideas</a></li>
+    <li><a href="glossary.html" aria-current="page">Glossary</a></li>
+    <li><a href="about.html">About</a></li>
+  </ul></nav>
+</div></header>
+
+<main id="main">
+  <p class="kicker">Reference</p>
+  <h1>Glossary</h1>
+  <p class="lede">Planning, housing-data and statistics terms used on this site, in plain words. On other pages, terms with a dotted underline show these definitions when you hover over them or tab to them.</p>
+  <p class="small muted prose">These are general background definitions written for this site, not findings from the research.</p>
+  <dl class="glossary" id="glossary"></dl>
+</main>
+
+<footer class="site-footer"><div class="inner">
+  Static snapshot built from the UrbanResearch work branches. <a href="about.html">Sources and commits</a>.
+</div></footer>
+<script src="data/site-data.js"></script>
+<script src="assets/glossary.js"></script>
+<script src="assets/site.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const dl = document.getElementById("glossary");
+    window.GLOSSARY.slice().sort((a, b) => a.term.localeCompare(b.term)).forEach((g) => {
+      const dt = document.createElement("dt");
+      dt.id = g.id;
+      dt.textContent = g.term;
+      const dd = document.createElement("dd");
+      dd.textContent = g.def;
+      dl.append(dt, dd);
+    });
+    if (location.hash) {
+      const t = document.getElementById(location.hash.slice(1));
+      if (t) t.scrollIntoView();
+    }
+  });
+</script>
+</body>
+</html>
