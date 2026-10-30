@@ -105,7 +105,8 @@
     });
   }
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideTip(); });
-  window.addEventListener("scroll", hideTip, { passive: true });
+  // No hide-on-scroll: the tip is positioned in document coordinates, and focusing an
+  // off-screen term scrolls the page, which would otherwise close the tip immediately.
 
   window.Site = { D, get, el, fmt, renderList, fillFigures, fillProvenance, initTerms };
 

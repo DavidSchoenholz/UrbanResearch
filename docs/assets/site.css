@@ -298,12 +298,12 @@ table.bars tr:hover th, table.bars tr:hover .val { color: var(--ink); font-weigh
 /* pipeline diagram */
 .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 8px 0 12px; }
 .stage { position: relative; padding: 16px 22px 16px 16px; background: var(--surface); border: 1px solid var(--rule); }
-.stage + .stage { border-left: 0; }
+.stage + .stage { border-left: 0; padding-left: 24px; }
 .stage:first-child { border-radius: 10px 0 0 10px; }
 .stage:last-child { border-radius: 0 10px 10px 0; }
 .stage:not(:last-child)::after {
   content: ""; position: absolute; right: -11px; top: 26px; width: 20px; height: 20px; z-index: 1;
-  background: var(--surface); border-top: 1px solid var(--rule); border-right: 1px solid var(--rule); transform: rotate(45deg);
+  background: var(--surface); border-top: 2px solid var(--rule-strong); border-right: 2px solid var(--rule-strong); transform: rotate(45deg);
 }
 .stage h3 { font-size: 19px; margin: 0 0 2px; }
 .stage .what { font-size: 14px; color: var(--ink-2); margin: 0 0 10px; }

@@ -88,13 +88,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Plain-language headline for each (this site's wording) and the matching condition from the
   // verdict section of feasibility.md (index into verdict_conditions, or null).
   const plain = [
-    ["Neighbourhood-level counts of completed homes stop in 2022.", 1],
+    ["Counts of completed homes below the whole-city level stop in 2022.", 1],
     ["What the zoning was on a past date can be reconstructed only in part.", 0],
     ["Toronto's 2013 city-wide zoning by-law still does not cover the whole city.", 0],
     ["A closed-out building permit is not the same as a finished home.", 1],
     ["The open data overwrites appeal history, so older appeals are mostly invisible.", 2],
     ["Applications can be tied to permits reliably only for larger projects; the rest are matched by address.", null],
-    ["The projects are far from a random sample: most large ones needed a rezoning, most small ones a minor variance (upper bounds).", 3],
+    ["The projects are far from a random sample: most large ones are linked to a rezoning, most small ones to a minor variance (upper bounds).", 3],
     ["Lost units from demolitions are recorded patchily, so “net new homes” is a weak measure.", 4],
   ];
   const terms = {
