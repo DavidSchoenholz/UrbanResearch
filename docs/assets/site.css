@@ -156,7 +156,7 @@ li + li { margin-top: 4px; }
 .callout { border: 1px solid var(--rule); border-left: 4px solid var(--accent); background: var(--surface); border-radius: 6px; padding: 14px 16px; margin: 0 0 18px; }
 .callout > :last-child { margin-bottom: 0; }
 .callout.scope { border-left-color: var(--ink-2); }
-.callout.scope strong:first-child { display: block; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.callout.scope > strong:first-child { display: block; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 .unverified { border: 1px dashed var(--warn-rule); background: var(--warn-bg); border-radius: 8px; padding: 16px 18px; }
 .unverified > :last-child { margin-bottom: 0; }
 .tag-unverified {
@@ -241,8 +241,10 @@ table.bars { font-size: 14px; border: 0; }
 table.bars th, table.bars td { border: 0; padding: 3px 0; }
 table.bars th[scope="row"] { font-weight: 400; padding-right: 12px; width: 1%; white-space: nowrap; color: var(--ink); }
 table.bars td.bar { width: 100%; }
-table.bars .track { position: relative; height: 22px; display: flex; align-items: center; gap: 8px; }
-table.bars .fill { height: 14px; border-radius: 0 4px 4px 0; background: var(--series-1); min-width: 2px; flex: none; }
+table.bars .track { position: relative; height: 22px; }
+/* Bars scale within (track width - room for the value label); the label sits at the bar tip. */
+table.bars .fill { position: absolute; left: 0; top: 4px; height: 14px; width: calc((100% - 5.5em) * var(--f)); min-width: 2px; border-radius: 0 4px 4px 0; background: var(--series-1); }
+table.bars .val { position: absolute; top: 1px; left: calc((100% - 5.5em) * var(--f) + 8px); }
 table.bars .fill.alt { background: var(--series-2); }
 table.bars .val { font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; }
 table.bars tr:hover th, table.bars tr:hover .val { color: var(--ink); font-weight: 600; }
@@ -252,6 +254,23 @@ table.bars tr:hover th, table.bars tr:hover .val { color: var(--ink); font-weigh
 .legend .sw.alt { background: var(--series-2); }
 .chart-note { font-size: 14px; color: var(--muted); margin-top: 8px; max-width: 70ch; }
 @media (max-width: 480px) { table.bars th[scope="row"] { white-space: normal; min-width: 7.5em; } }
+
+/* Narrow screens: tables marked .stack become one card per row, labelled by data-label. */
+@media (max-width: 640px) {
+  table.stack, table.stack tbody, table.stack tr, table.stack td, table.stack tbody th { display: block; width: auto; min-width: 0 !important; }
+  table.stack thead tr { display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 8px 12px; background: var(--surface-2); }
+  table.stack thead th { padding: 0; background: none; border: 0; }
+  table.stack thead th:not(:has(button)) { display: none; }
+  table.stack thead:not(:has(button)) { display: none; }
+  table.stack tbody tr { padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  table.stack tbody tr:last-child { border-bottom: 0; }
+  table.stack td, table.stack tbody th { border: 0; padding: 2px 0; text-align: left; white-space: normal; }
+  table.stack td[data-label]::before { content: attr(data-label) ": "; font-weight: 600; font-size: 13px; color: var(--ink-2); }
+  table.stack td.num { text-align: left; }
+  #sources-table tr.detail td { padding: 10px 0 4px; background: none; }
+  #sources-table tr.detail { background: var(--surface-2); }
+  .tl-axis .ticks span:nth-child(even) { display: none; }
+}
 
 /* column chart (multiplex permits) */
 .cols { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; align-items: end; height: 190px; border-bottom: 1px solid var(--rule-strong); padding-top: 18px; max-width: 640px; }

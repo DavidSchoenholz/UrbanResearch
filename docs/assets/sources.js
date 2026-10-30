@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const tr = el("tr");
       tr.appendChild(el("td", { text: r.id }));
       tr.appendChild(el("th", { scope: "row", style: "font-weight:600" }, esc(r.dataset)));
-      tr.appendChild(el("td", { text: r.publisher }));
-      tr.appendChild(el("td", { text: r.temporal_coverage }));
+      tr.appendChild(el("td", { "data-label": "Publisher", text: r.publisher }));
+      tr.appendChild(el("td", { "data-label": "Years", text: r.temporal_coverage }));
       const warn = r.provenance_group !== "Opened and verified";
       tr.appendChild(el("td", null, `<span class="pill${warn ? " warn" : ""}">${esc(r.provenance_group)}</span>`));
       const td = el("td");

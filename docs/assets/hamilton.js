@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       tr.appendChild(el("th", { scope: "row", text: opts.label ? opts.label(k) : k }));
       const td = el("td", { class: "bar" });
       const cls = "fill" + (opts.alt && opts.alt(k) ? " alt" : "");
-      td.innerHTML = `<div class="track"><span class="${cls}" style="width:calc(${(n / max) * 100}% - 5em)"></span><span class="val">${fmt(n)}</span></div>`;
+      td.innerHTML = `<div class="track" style="--f:${(n / max).toFixed(5)}"><span class="${cls}"></span><span class="val">${fmt(n)}</span></div>`;
       tr.appendChild(td);
       tb.appendChild(tr);
     });
@@ -105,7 +105,7 @@ document.addEventListener("DOMContentLoaded", () => {
   conds.forEach(([name, n, how]) => {
     const tr = el("tr");
     tr.appendChild(el("th", { scope: "row" }, name));
-    tr.appendChild(el("td", { class: "num", text: fmt(n) }));
+    tr.appendChild(el("td", { class: "num", "data-label": "Parcels", text: fmt(n) }));
     tr.appendChild(el("td", null, how));
     ct.appendChild(tr);
   });
@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
   dq.forEach(([what, val, how]) => {
     const tr = el("tr");
     tr.appendChild(el("th", { scope: "row" }, what));
-    tr.appendChild(el("td", { class: "num", text: val }));
+    tr.appendChild(el("td", { class: "num", "data-label": "Value", text: val }));
     tr.appendChild(el("td", null, how));
     dt.appendChild(tr);
   });
