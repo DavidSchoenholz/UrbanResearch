@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Urban Research Overview</title>
+<meta name="description" content="A plain-language overview of the UrbanResearch work: Toronto feasibility, the Phase 2 pipeline, Hamilton parcel zoning, the TRREB price map and ideas to try next.">
+<style>
+:root{--bg:#faf8f4;--fg:#1d1b18;--mut:#625d55;--line:#ddd6ca;--card:#fff;--acc:#1f5f8b;--acc2:#a4471f;--ok:#2d6a3e;--warn:#8a5a00;--chip:#efe9dd;--bar:#1f5f8b;--bar2:#c9822b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15140f;--fg:#ece7dc;--mut:#a8a193;--line:#34312a;--card:#1d1c16;--acc:#7db6e0;--acc2:#e69a6e;--ok:#7cc48f;--warn:#e0b25c;--chip:#2a2820;--bar:#7db6e0;--bar2:#e0a24f}}
+:root[data-theme="dark"]{--bg:#15140f;--fg:#ece7dc;--mut:#a8a193;--line:#34312a;--card:#1d1c16;--acc:#7db6e0;--acc2:#e69a6e;--ok:#7cc48f;--warn:#e0b25c;--chip:#2a2820;--bar:#7db6e0;--bar2:#e0a24f}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.6 Georgia,"Iowan Old Style",serif}
+a{color:var(--acc)}
+.wrap{max-width:60rem;margin:0 auto;padding:0 16px}
+h1,h2,h3,.sans{font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+h1{font-size:clamp(2rem,6vw,3.2rem);line-height:1.1;margin:.2em 0 .3em;letter-spacing:-.02em}
+h2{font-size:1.6rem;margin:0 0 .3em;letter-spacing:-.01em}
+h3{font-size:1.05rem;margin:1.4em 0 .4em}
+header.top{padding:48px 0 24px}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+nav .wrap{display:flex;gap:4px 16px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;font:14px system-ui,sans-serif}
+nav a{text-decoration:none;color:var(--mut);padding:2px 0}
+nav a:hover,nav a:focus{color:var(--fg);text-decoration:underline}
+section{padding:40px 0 8px;border-top:1px solid var(--line)}
+.lede{color:var(--mut);max-width:42rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:14px;margin:20px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px}
+.card h3{margin-top:0}
+.badge{display:inline-block;font:600 12px system-ui,sans-serif;padding:2px 8px;border-radius:99px;background:var(--chip);color:var(--fg);border:1px solid var(--line)}
+.badge.ok{color:var(--ok)}.badge.warn{color:var(--warn)}
+.note{border-left:4px solid var(--warn);background:var(--chip);padding:10px 14px;margin:18px 0;border-radius:0 6px 6px 0;font-size:.95rem}
+.verdict{font:700 1.1rem system-ui,sans-serif;color:var(--ok)}
+details{border:1px solid var(--line);border-radius:8px;background:var(--card);margin:8px 0}
+summary{cursor:pointer;padding:10px 14px;font-family:system-ui,sans-serif;font-weight:600}
+details>div{padding:0 14px 12px;color:var(--fg)}
+details>div p{margin:.4em 0}
+.unv{display:inline-block;font:700 11px system-ui,sans-serif;background:var(--warn);color:var(--bg);padding:1px 6px;border-radius:4px;vertical-align:middle}
+ul.tight{padding-left:1.2em}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;font-family:system-ui,sans-serif}
+input,select{max-width:100%;font:inherit;font-size:15px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg)}
+input[type=search]{flex:1;min-width:12rem}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font:14px/1.4 system-ui,sans-serif}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{white-space:nowrap}
+th button{all:unset;cursor:pointer;font-weight:700}
+th button:focus-visible{outline:2px solid var(--acc)}
+tr.row{cursor:pointer}tr.row:hover{background:var(--chip)}
+tr.detail td{background:var(--chip)}
+tr.detail dl{margin:0;display:grid;grid-template-columns:9rem 1fr;gap:4px 12px}
+tr.detail dt{font-weight:700}tr.detail dd{margin:0;overflow-wrap:anywhere}
+.flow{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;margin:18px 0;font-family:system-ui,sans-serif}
+.flow .step{flex:1 1 9rem;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:14px}
+.flow .step b{display:block;font-size:15px;margin-bottom:4px}
+.flow .arrow{align-self:center;color:var(--mut);font-size:20px}
+.chart{margin:10px 0 24px}
+.chart h3{margin-bottom:2px}
+.chart p.take{margin:0 0 8px;color:var(--mut);font-size:.95rem}
+.bars{font:14px system-ui,sans-serif}
+.bar{display:grid;grid-template-columns:minmax(6rem,11rem) 1fr;gap:8px;align-items:center;margin:3px 0}
+.bar .lab{text-align:right;overflow-wrap:anywhere}
+.bar .track{position:relative;height:20px;min-width:0}
+.bar .fill{height:100%;background:var(--bar);border-radius:0 3px 3px 0;min-width:2px}
+.bar .val{position:absolute;left:calc(var(--w) + 6px);top:0;line-height:20px;white-space:nowrap}
+.bar.alt .fill{background:var(--bar2)}
+.stat{font:700 1.7rem system-ui,sans-serif}
+.stat small{display:block;font:400 13px system-ui,sans-serif;color:var(--mut)}
+.pill{display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border-radius:99px;background:var(--chip);font:13px system-ui,sans-serif}
+abbr{text-decoration:underline dotted;cursor:help}
+dl.gloss dt{font:700 15px system-ui,sans-serif;margin-top:10px}dl.gloss dd{margin:0}
+footer{padding:32px 0 60px;color:var(--mut);font-size:.9rem;border-top:1px solid var(--line);margin-top:40px}
+code{font-size:.9em;background:var(--chip);padding:1px 5px;border-radius:4px}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;background:var(--card);padding:6px;z-index:9}
+@media (max-width:560px){.bars{overflow:hidden}.bar{grid-template-columns:5.5rem 1fr}tr.detail dl{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<nav aria-label="Sections"><div class="wrap">
+<a href="#home">Where things stand</a><a href="#toronto">Toronto feasibility</a><a href="#sources">Data sources</a><a href="#phase2">Phase 2 pipeline</a><a href="#hamilton">Hamilton zoning</a><a href="#trreb">Toronto prices</a><a href="#ideas">Ideas</a><a href="#about">About &amp; glossary</a>
+</div></nav>
+
+<main id="main" class="wrap">
+<header class="top" id="home">
+  <p class="sans" style="margin:0;color:var(--mut)">UrbanResearch · overview</p>
+  <h1>What has been done, how solid it is, and what could come next</h1>
+  <p class="lede">This repository studies how zoning relates to housing in Ontario cities. Most of the work so far is groundwork: finding and checking data, and building tools. <strong>None of it is a finding about housing supply or policy.</strong> Each card says plainly where it stands.</p>
+
+  <div class="grid">
+    <div class="card"><span class="badge ok">Study complete (with limits)</span><h3>Toronto feasibility (Phase 1)</h3><p>Can we study how zoning relates to housing completions in Toronto? Verdict: <strong>GO WITH LIMITS</strong>. 30 data sources checked.</p><a href="#toronto">Read more →</a></div>
+    <div class="card"><span class="badge warn">Code only, synthetic data</span><h3>Phase 2 pipeline</h3><p>A tested code skeleton for following a project from zoning to completion. It has run only on made-up data and says nothing about Toronto.</p><a href="#phase2">Read more →</a></div>
+    <div class="card"><span class="badge warn">Output produced, not yet interpreted</span><h3>Hamilton parcel zoning</h3><p>The zone in force on 177,753 property parcels, with an interactive map. A spatial match, not a policy conclusion.</p><a href="#hamilton">Read more →</a></div>
+    <div class="card"><span class="badge warn">Code only, data not committed</span><h3>Toronto price map</h3><p>Tools that read TRREB's free public reports into a neighbourhood price map. TRREB's data is copyrighted and kept out of the repository.</p><a href="#trreb">Read more →</a></div>
+    <div class="card"><span class="badge">Idea, unverified</span><h3>Ideas to try next</h3><p>Under-studied angles on city life, with suggested data that still needs checking.</p><a href="#ideas">Read more →</a></div>
+  </div>
+  <p><strong>What to read first:</strong> the Toronto verdict and its limits, then the Hamilton section. Both explain what the numbers do and do not mean.</p>
+</header>
+
+<section id="toronto">
+  <h2>Toronto feasibility (Phase 1)</h2>
+  <p class="verdict">Verdict: GO WITH LIMITS</p>
+  <p>Phase 1 asked whether the data exist to study how zoning relates to what gets applied for, permitted and completed in Toronto. The answer is yes, but with eight important limits. <strong>This is a feasibility study, not a finding about Toronto's housing.</strong></p>
+  <p>The first pass was offline. The second pass, summarised here, read every Toronto open-data record through the City's API and pulled CMHC tables directly. StatCan pages and the Ontario legislature and e-Laws pages could not be read, so claims depending on them stay marked <span class="unv">UNVERIFIED</span>.</p>
+
+  <h3>The eight key limitations</h3>
+  <details><summary>1. Census-tract completions end in 2022</summary><div><p>CMHC returns census-tract completions for 2010–2022. Exports for 2023 onward say "This data series is now archived". Toronto-wide completions continue to 2025, and census-tract <em>starts</em> continue to 2025. The census tracts reconcile with the city total (16,292 vs. 16,296 in 2022).</p></div></details>
+  <details><summary>2. Zoning history is only partly recoverable</summary><div><p>The open zoning layer is one snapshot, "updated to include amendments up to June 18th, 2023".</p><ul class="tight"><li>Backcasting is possible for 569-2013 lands: 27.5% of 5,247 Chapter 900 exceptions cite their amending by-law with its year. The Wayback Machine also holds copies from 2023-04 and 2024-06.</li><li>Lands still under former by-laws have no GIS. That covers 50.8% of 50+ unit new-building permit sites.</li></ul></div></details>
+  <details><summary>3. By-law 569-2013 did not fully replace the former by-laws</summary><div><p>The City says it "does not fully replace all older bylaws in every area". About 1,500 low-rise parcels were excluded, and 2026 by-laws are still bringing lands in. Some 2013 provisions remain under <abbr title="Ontario Land Tribunal, which hears planning appeals">OLT</abbr> appeal (PL130592 / OLT-22-002465).</p></div></details>
+  <details><summary>4. Cleared permits are not completions</summary><div><p>Units on cleared permits equal 22–62% of CMHC completions each year 2002–2024 (correlation 0.23). The data has no 2007 clearances and a 2025 batch-closure spike.</p></div></details>
+  <details><summary>5. Appeal history is overwritten</summary><div><p>Development Applications show current status only: 20–29% of 2020–2025 rezoning files show an appeal state, but only 0–5% of 2008–2015 files. There is no open OLT dataset; Case Status keeps cases two years after closure. Committee of Adjustment appeals are open (Toronto Local Appeal Body (TLAB) data, from 2017).</p></div></details>
+  <details><summary>6. Application → permit links exist only for large Planning-Act projects</summary><div><p>The Development Pipeline links them for projects at or above the Site Plan threshold ("fewer than 10 units" are excluded). Its <code>Application Number</code> matches 96.9% of application records, and 98% of "Built" projects match a permit address. It has no permit IDs and no built dates. Everything else links by address.</p></div></details>
+  <details><summary>7. Selection is severe</summary><div><p>Among 2018–2025 new-residential permits, 87% of 50+ unit projects are rezoning-linked, and 72–79% of 1–4 unit projects are linked to a minor variance (upper bounds).</p></div></details>
+  <details><summary>8. Net units are weak</summary><div><p><code>DWELLING_UNITS_LOST</code> is filled on about 35% of permits, and the fill rate rises over time.</p></div></details>
+
+  <h3>Recommended study frame (Phase 2 to confirm)</h3>
+  <ul class="tight">
+    <li><strong>Period:</strong> cohorts 2013-05-09 to 2017, with outcomes to 2022 (census-tract completions); an extension to 2025 using permits and census-tract starts; a multiplex marker window around 2023-05-10. New 2–6 unit permits went from 47 in 2022 to 243 in 2025.</li>
+    <li><strong>Unit of analysis:</strong> address/parcel for timing and attrition; 2021 census tract for completions.</li>
+  </ul>
+
+  <h3>Still unverified</h3>
+  <div class="note"><ul class="tight" style="margin:0">
+    <li><span class="unv">UNVERIFIED</span> Bill 23 and Bill 185 royal assent dates (2022-11-28; 2024-06-06).</li>
+    <li><span class="unv">UNVERIFIED</span> In-force dates of the multiplex (2023-05-12) and garden-suite (2022-07-04) by-laws.</li>
+    <li><span class="unv">UNVERIFIED</span> StatCan Census fields and release dates.</li>
+    <li><span class="unv">UNVERIFIED</span> The geography of CMHC's conversions and demolitions tables.</li>
+    <li><span class="unv">UNVERIFIED</span> Whether files from before 2023 can be retrieved from the Wayback Machine.</li>
+  </ul></div>
+  <p><a id="lnk-summary" href="#">Full Phase 1 summary on GitHub →</a> · <a id="lnk-feas" href="#">feasibility.md →</a></p>
+</section>
+
+<section id="sources">
+  <h2>Data sources explorer</h2>
+  <p class="lede">The 30 sources checked in Phase 1, straight from <code>inventory.csv</code>. Click a row for limitations and join keys.</p>
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search datasets, publishers, fields…" aria-label="Search data sources">
+    <select id="pub" aria-label="Filter by publisher"><option value="">All publishers</option></select>
+    <span id="count" class="sans" style="align-self:center;color:var(--mut);font-size:14px"></span>
+  </div>
+  <div class="tablebox"><table id="inv"><thead><tr>
+    <th><button data-k="id">ID</button></th><th><button data-k="dataset">Dataset</button></th><th><button data-k="publisher">Publisher</button></th><th><button data-k="temporal_coverage">Coverage in time</button></th>
+  </tr></thead><tbody></tbody></table></div>
+</section>
+
+<section id="phase2">
+  <h2>Phase 2 pipeline</h2>
+  <span class="badge warn">Code only, synthetic data</span>
+  <p>A code skeleton for following a development from zoning through application and permit to completion. <strong>It has only been run on synthetic data.</strong> No real Toronto data is loaded, and nothing here describes Toronto; the loaders are deliberately unfilled until field names are confirmed from verified data dictionaries.</p>
+  <div class="flow" role="list" aria-label="Pipeline steps">
+    <div class="step" role="listitem"><b>Zoning</b><code>zoning.py</code> zoning in force <em>as of</em> a date; capacity (upper bound)</div><div class="arrow" aria-hidden="true">→</div>
+    <div class="step" role="listitem"><b>Application</b><code>linking.py</code> one-to-one link of applications to projects</div><div class="arrow" aria-hidden="true">→</div>
+    <div class="step" role="listitem"><b>Permit</b><code>linking.py</code> chains permits into projects</div><div class="arrow" aria-hidden="true">→</div>
+    <div class="step" role="listitem"><b>Completion</b><code>funnel.py</code>, <code>survival.py</code>, <code>reconcile.py</code></div>
+  </div>
+  <p>Supporting modules: <code>schema.py</code> (canonical tables), <code>loaders.py</code> (refuses to run with an unfilled mapping), <code>spatial.py</code> (optional point-in-parcel join), <code>synthetic.py</code> (test data with a known truth).</p>
+  <h3>Design decisions, in plain English</h3>
+  <ul class="tight">
+    <li><strong>Zoning as of the application date</strong>, never today's zoning. If the zoning table has no history, the join degenerates into a snapshot.</li>
+    <li><strong>Rezoning is kept separate from as-of-right</strong>, because applications are selected on zoning not permitting what the developer wants. An unlinked project is not necessarily as-of-right; it may be a failed link.</li>
+    <li><strong>Permits are rolled up to projects</strong>; a project is complete only when all observed permits are cleared.</li>
+    <li><strong>Completion rates use cumulative incidence, not simple shares.</strong> Recent cohorts have not had time to complete, so the naive share is biased low; treating refusals as censoring would bias the other way.</li>
+  </ul>
+  <h3>Known limitations</h3>
+  <ul class="tight">
+    <li>Link failures look like non-completion, biasing completion low.</li>
+    <li>Approved projects that silently die are invisible without a cancellation record.</li>
+    <li>Refused or withdrawn applications with no decision date are treated as censored, which biases completion high.</li>
+    <li>Existing floor area is normally a current snapshot, so it understates unbuilt capacity for past applications; capacity from floor-area ratio alone is an upper bound.</li>
+    <li>Bootstrap intervals ignore spatial clustering. The synthetic test shows the estimators work when the assumptions hold; it says nothing about how well they hold in real data.</li>
+  </ul>
+  <div class="note"><strong>Blocked on real data:</strong> fill the loader mappings from verified dictionaries; check whether the zoning table has any history; choose <code>data_end</code>, the unit of analysis and a study period; reconcile project completions with the aggregate series before trusting permit clearance as a completion measure.</div>
+  <p><a id="lnk-p2" href="#">Phase 2 README on GitHub →</a></p>
+</section>
+
+<section id="hamilton">
+  <h2>Hamilton parcel zoning</h2>
+  <span class="badge warn">Output produced, not yet interpreted</span>
+  <p>The zone in force on every property parcel in Hamilton, built by overlaying the City's own public parcel and zoning layers (downloaded 2026-10-30). <strong>This is a spatial match, not a policy conclusion, and not a zoning confirmation: the City's legal by-law text governs.</strong></p>
+  <div class="grid" id="hstats"></div>
+  <div class="note" id="hvalid"></div>
+
+  <div class="chart"><h3>About 73% of parcels follow the new city-wide by-law</h3><p class="take">The rest are still governed by a former municipality's by-law, whose zone codes are not comparable with 05-200.</p><div class="bars" id="c-bylaw" role="img" aria-label="Parcels by governing by-law; values listed in the bars"></div></div>
+  <div class="chart"><h3>Most parcels are residential</h3><p class="take">Parcels by City zoning category.</p><div class="bars" id="c-cat" role="img" aria-label="Parcels by zone category"></div></div>
+  <div class="chart"><h3>Two zone codes (R1 and R1a) cover about half of all parcels</h3><p class="take">Top 12 zone codes. R1 and R1a are low-density residential. Codes differ across by-laws, so compare categories, not codes, across the city.</p><div class="bars" id="c-code" role="img" aria-label="Parcels by top zone codes"></div></div>
+
+  <h3>How to read this: caveats</h3>
+  <ul class="tight">
+    <li><strong>The appeal tag is not a live-appeal flag.</strong> 70,968 parcels sit on polygons tagged with an OLT/OMB case number, but the common tags line up with the city-wide by-law that introduced a zone family. That says the parent by-law was appealed, not that the parcel is under appeal today.</li>
+    <li><strong>Current snapshot only.</strong> There is no history of the zoning layer on the server.</li>
+    <li><strong>Exceptions and holdings change what is permitted.</strong> The map shows that one applies, not what it says.</li>
+    <li><strong>Shared and doubtful shapes.</strong> Condo-unit rolls share footprints, and <span id="susp"></span> rows are flagged as geometry suspect.</li>
+    <li><strong>Some totals are unexplained in the source.</strong> Parcel areas add up to <span id="asum"></span> km² while their union is <span id="aun"></span> km², and 571 rows repeat a property number (multi-part parcels, per the source README). The source does not reconcile the area gap.</li>
+    <li>Validation confirms the projection and join are right. It does not check the City's layer against the legal by-law.</li>
+  </ul>
+  <p>The interactive map lives on the Hamilton branch (it needs about 68 MB of data, so it is not copied here): <a id="lnk-ham-map" href="#">map source on GitHub →</a>. To view it, check out that branch and run <code>cd hamilton/parcel_zoning/site &amp;&amp; python3 -m http.server 8000</code>. <a id="lnk-ham-readme" href="#">Hamilton README →</a></p>
+</section>
+
+<section id="trreb">
+  <h2>Toronto price map (TRREB Market Watch)</h2>
+  <span class="badge warn">Code only, data not committed</span>
+  <p>Tools that download TRREB's <strong>free, publicly linked</strong> Market Watch and community reports, check them, and build a neighbourhood price map plus a district price log. TRREB's content is copyrighted, so downloaded files and derived tables are kept out of the repository; <strong>only code is committed</strong>, and no map is published here.</p>
+  <ul class="tight">
+    <li>Every parsed row is checked: sales × average price must match dollar volume, and districts must sum to the City total. A file that fails is dropped and reported.</li>
+    <li>On the real archive, 182 of 183 monthly reports (July 2011 to September 2026) and 45 of 45 community reports validate.</li>
+  </ul>
+  <h3>Limitations</h3>
+  <ul class="tight">
+    <li>May 2022 fails validation and is excluded; reports before July 2011 are not parsed.</li>
+    <li>Only 116 of 158 neighbourhoods are mapped (exact-name matches only). Community data starts in 2022 Q4.</li>
+    <li>Averages are not quality-adjusted, and TRREB suppresses small communities.</li>
+  </ul>
+  <p><a id="lnk-trreb" href="#">TRREB README on GitHub →</a></p>
+</section>
+
+<section id="ideas">
+  <h2>Ideas to try next</h2>
+  <span class="badge">Idea, unverified</span>
+  <div class="note">Under-studied angles chosen because they are awkward to measure. <strong>Data sources are suggestions and still need to be verified before relying on them.</strong></div>
+  <div class="controls"><select id="ifilter" aria-label="Filter ideas"><option value="">All ideas</option><option>Good first project</option><option>More idea</option><option>Housing &amp; transit follow-up</option></select></div>
+  <div class="grid" id="ideas-grid"></div>
+</section>
+
+<section id="about">
+  <h2>About &amp; provenance</h2>
+  <p>Everything above is summarised from files on the work branches below, and nothing here is new analysis. Figures in the data explorer and Hamilton charts are generated from the sources by <code>docs/build_data.py</code> (run it from the repo root after <code>git fetch origin</code>).</p>
+  <div class="tablebox"><table><thead><tr><th>Section</th><th>Branch</th><th>Files</th><th>Commit read</th></tr></thead><tbody id="prov"></tbody></table></div>
+  <h3>Glossary</h3>
+  <dl class="gloss">
+    <dt>Aalen-Johansen</dt><dd>A statistical method for estimating how likely each of several outcomes (completion, refusal…) is over time, when some cases have not finished yet.</dd>
+    <dt>CMHC</dt><dd>Canada Mortgage and Housing Corporation, source of housing starts and completions tables.</dd>
+    <dt>Holding provision</dt><dd>A zoning "H" that blocks development until conditions are met.</dd>
+    <dt>OLT / OMB</dt><dd>Ontario Land Tribunal (formerly the Ontario Municipal Board), which hears planning appeals.</dd>
+    <dt>Split-zoned</dt><dd>A parcel with two or more zones each covering at least 5% and 10 m² of it.</dd>
+    <dt>Censored</dt><dd>A case whose outcome is not yet known at the end of the observation window.</dd>
+    <dt>TRREB</dt><dd>Toronto Regional Real Estate Board.</dd>
+  </dl>
+</section>
+<footer>This page is a presentation of repository contents. It reports status honestly and makes no claims beyond the cited source files.</footer>
+</main>
+<script src="data/data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
