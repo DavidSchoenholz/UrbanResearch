@@ -1,0 +1,266 @@
+{
+  "checked_at": "2026-10-30T20:01:32+00:00",
+  "seed": 20261030,
+  "single_zone": {
+    "checked": 300,
+    "agree": 300,
+    "agree_share": 1.0
+  },
+  "split_zoned": {
+    "checked": 300,
+    "agree": 275,
+    "agree_share": 0.9167
+  },
+  "mismatches": [
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "76513",
+      "address": "2774 KING ST E - HAMILTON",
+      "ours": "G/S-955",
+      "all_ours": "G/S-955, G/S-955a | G/S-966, G/S-966a",
+      "city_at_point": [
+        "G/S-966"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "20857",
+      "address": " ISAAC BROCK DR - STONEY CREEK",
+      "ours": "R1",
+      "all_ours": "R1 | I3, T8 | I | P3, T8",
+      "city_at_point": [
+        "I"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "162413",
+      "address": "365 PARKSIDE DR - FLAMBOROUGH",
+      "ours": "A2",
+      "all_ours": "A2 | P7 | P8",
+      "city_at_point": [
+        "P8"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "154485",
+      "address": "4 KIRBY AVE - FLAMBOROUGH",
+      "ours": "P6",
+      "all_ours": "P6 | S1",
+      "city_at_point": [
+        "S1"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "151684",
+      "address": "1117 OLD GOVERNORS RD - FLAMBOROUGH",
+      "ours": "A2",
+      "all_ours": "A2 | P6",
+      "city_at_point": [
+        "P6"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "165750",
+      "address": "126 CONCESSION 11 RD E - FLAMBOROUGH",
+      "ours": "P8",
+      "all_ours": "P8 | P7",
+      "city_at_point": [
+        "P7"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "128007",
+      "address": "2646 GOVERNORS RD - ANCASTER",
+      "ours": "A1",
+      "all_ours": "A1 | P8",
+      "city_at_point": [
+        "P8"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "75192",
+      "address": "2013 BARTON ST E - HAMILTON",
+      "ours": "R1",
+      "all_ours": "R1 | G",
+      "city_at_point": [
+        "G"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "163809",
+      "address": "261 CONCESSION 5 RD E - FLAMBOROUGH",
+      "ours": "S1",
+      "all_ours": "S1 | A2",
+      "city_at_point": [
+        "A2"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "168156",
+      "address": "2555 GOLF CLUB RD - GLANBROOK",
+      "ours": "A1",
+      "all_ours": "A1 | P6",
+      "city_at_point": [
+        "P6"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "153612",
+      "address": "1804 GORE RD - FLAMBOROUGH",
+      "ours": "A2",
+      "all_ours": "A2 | P7 | P8",
+      "city_at_point": [
+        "P8"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "153223",
+      "address": " CONCESSION 8 W - FLAMBOROUGH",
+      "ours": "P6",
+      "all_ours": "P6 | P8 | P7",
+      "city_at_point": [
+        "P8"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "155239",
+      "address": "396 CONCESSION 4 W - FLAMBOROUGH",
+      "ours": "P8",
+      "all_ours": "P8 | A1",
+      "city_at_point": [
+        "A1"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "142041",
+      "address": "1534 SOUTHCOTE RD - ANCASTER",
+      "ours": "P7",
+      "all_ours": "P7 | A2",
+      "city_at_point": [
+        "A2"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "156318",
+      "address": "1572 BROCK RD - FLAMBOROUGH",
+      "ours": "S1",
+      "all_ours": "S1 | P7 | P8",
+      "city_at_point": [
+        "P7"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "172385",
+      "address": "6160 BERRY RD - GLANBROOK",
+      "ours": "A1",
+      "all_ours": "A1 | P6",
+      "city_at_point": [
+        "P6"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "168135",
+      "address": "2598 GUYATT RD - GLANBROOK",
+      "ours": "A1",
+      "all_ours": "A1 | P7",
+      "city_at_point": [
+        "P7"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "168155",
+      "address": "2569 GOLF CLUB RD - GLANBROOK",
+      "ours": "A1",
+      "all_ours": "A1 | P6",
+      "city_at_point": [
+        "P6"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "16519",
+      "address": "22 CHERRYWOOD DR - STONEY CREEK",
+      "ours": "R2",
+      "all_ours": "R2 | OS",
+      "city_at_point": [
+        "OS"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "16203",
+      "address": " POWERLINE RD - STONEY CREEK",
+      "ours": "P6",
+      "all_ours": "P6 | A1 | P8 | P7",
+      "city_at_point": [
+        "A1"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "149219",
+      "address": "154 OLD GUELPH RD - DUNDAS",
+      "ours": "P7",
+      "all_ours": "P7, 803 | A2, 800",
+      "city_at_point": [
+        "A2"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "158436",
+      "address": "55 FIRST ST - FLAMBOROUGH",
+      "ours": "CM",
+      "all_ours": "CM | R1",
+      "city_at_point": [
+        "R1"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "166155",
+      "address": "9 ROADWAY - FLAMBOROUGH",
+      "ours": "P7",
+      "all_ours": "P7 | P4",
+      "city_at_point": [
+        "P4"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "156120",
+      "address": "964 CONCESSION 8 W - FLAMBOROUGH",
+      "ours": "A1",
+      "all_ours": "A1 | P8",
+      "city_at_point": [
+        "P8"
+      ]
+    },
+    {
+      "stratum": "split_zoned",
+      "parcel_oid": "152824",
+      "address": "1180 CONCESSION 6 RD W - FLAMBOROUGH",
+      "ours": "P7",
+      "all_ours": "P7 | A1 | P6",
+      "city_at_point": [
+        "A1"
+      ]
+    }
+  ]
+}
