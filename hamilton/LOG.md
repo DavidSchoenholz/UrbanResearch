@@ -11,7 +11,8 @@ picked up later without redoing it. Newest session at the top. Add a new dated s
 - **Done:** Phase 1 for Hamilton (`phase1/`), parcel zoning table, validation and web map
   (`parcel_zoning/`).
 - **Data date:** all City layers downloaded 2026-10-30 (`parcel_zoning/output/summary.json` →
-  `source_manifest`). `raw/` is gitignored; `python scripts/fetch.py` re-downloads it in ~2 minutes.
+  `source_manifest`). The raw download is committed gzip-compressed in `parcel_zoning/raw/`
+  (39 MB); `python scripts/fetch.py` replaces it with a fresh download in ~2 minutes.
 - **To refresh the map with newer City data:** run the four scripts in `parcel_zoning/README.md`
   ("Rebuild"), check that `validation.json` still shows 300/300 for single-zone parcels, and commit
   the outputs with the new date.
@@ -99,3 +100,7 @@ structure and adds the parcel zoning map.
 2. Web map and live-service validation.
 3. Validated palette, legend order, parcel_zoning README.
 4. Phase 1 documents (summary, feasibility, inventory), this log, READMEs.
+5. Raw City downloads committed as `.geojson.gz` (user asked for everything to be committed).
+   `parcels.geojson` is 136 MB, over GitHub's 100 MB per-file limit, so fetch.py now writes gzip
+   and the scripts read through `scripts/rawio.py` (GDAL `/vsigzip/`). Re-running the overlay from the
+   compressed files reproduced both output CSVs and summary.json exactly.

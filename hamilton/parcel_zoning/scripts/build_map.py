@@ -1,6 +1,6 @@
 """Build the data files for the parcel zoning web map (site/).
 
-Reads output/hamilton_parcel_zoning.csv.gz (from build_parcel_zoning.py) and raw/*.geojson, and writes:
+Reads output/hamilton_parcel_zoning.csv.gz (from build_parcel_zoning.py) and raw/*.geojson.gz, and writes:
   site/data/meta.json             categories, by-laws, zone descriptions, headline numbers, data date
   site/data/zoning.json           zoning polygons dissolved by zone label, simplified (zoomed-out view)
   site/data/wards.json            ward outlines
@@ -17,8 +17,9 @@ import geopandas as gpd
 import pandas as pd
 import shapely
 
+from rawio import read_raw
+
 ROOT = Path(__file__).resolve().parent.parent
-RAW = ROOT / "raw"
 SITE = ROOT / "site" / "data"
 METRIC_CRS = "EPSG:26917"
 PARCEL_SIMPLIFY_M = 0.75
@@ -73,7 +74,7 @@ def main():
               bylaw_idx.get(r.bylaw)] for r in zkeys.itertuples()]
 
     # Parcels: one feature per distinct footprint.
-    p = gpd.read_file(RAW / "parcels.geojson")[["OBJECTID", "geometry"]].rename(columns={"OBJECTID": "parcel_oid"})
+    p = read_raw("parcels")[["OBJECTID", "geometry"]].rename(columns={"OBJECTID": "parcel_oid"})
     p["parcel_oid"] = p["parcel_oid"].astype(str)
     p = p.merge(tab, on="parcel_oid")
     p["ward"] = p["ward"].fillna("0")
@@ -143,7 +144,7 @@ def main():
                                  for r in srch.itertuples()])
 
     # Zoning polygons for the zoomed-out view.
-    z = gpd.read_file(RAW / "zoning.geojson").to_crs(METRIC_CRS)
+    z = read_raw("zoning").to_crs(METRIC_CRS)
     z = z[z.geometry.notna() & ~z.is_empty]
     z["geometry"] = shapely.make_valid(z.geometry.values)
     z["c"] = (z["ZONING_CATEGORY"].replace({"Low Density Residential": "Residential"})
@@ -157,7 +158,7 @@ def main():
     z = z[~z.geometry.is_empty][["zc", "c", "b", "geometry"]]
     write(SITE / "zoning.json", json.loads(z.to_json(drop_id=True)))
 
-    w = gpd.read_file(RAW / "wards.geojson").to_crs(METRIC_CRS)
+    w = read_raw("wards").to_crs(METRIC_CRS)
     w["geometry"] = w.geometry.simplify(15)
     w = w.to_crs("EPSG:4326")
     w["geometry"] = rounded(w.geometry.values)

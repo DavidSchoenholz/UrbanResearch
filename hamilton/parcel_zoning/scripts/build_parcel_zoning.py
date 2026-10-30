@@ -1,6 +1,6 @@
 """Assign zoning to every Hamilton parcel by area overlay.
 
-Reads raw/*.geojson (from scripts/fetch.py) and writes:
+Reads raw/*.geojson.gz (from scripts/fetch.py) and writes:
   output/hamilton_parcel_zoning.csv.gz    one row per parcel polygon, its primary zone and flags
   output/hamilton_parcel_zone_pieces.csv.gz  one row per (parcel, zoning polygon) overlap, with area share
   output/summary.json                     counts used in README / QA_REPORT
@@ -24,8 +24,9 @@ import numpy as np
 import pandas as pd
 import shapely
 
+from rawio import RAW, read_raw
+
 ROOT = Path(__file__).resolve().parent.parent
-RAW = ROOT / "raw"
 OUT = ROOT / "output"
 
 METRIC_CRS = "EPSG:26917"
@@ -67,7 +68,7 @@ def governing_bylaw(parent):
 
 
 def load_zoning():
-    z = gpd.read_file(RAW / "zoning.geojson").to_crs(METRIC_CRS)
+    z = read_raw("zoning").to_crs(METRIC_CRS)
     for c in ZONE_FIELDS:
         if c not in ("COUNCIL_APP_DATE", "FINALBINDING_DATE"):
             z[c] = clean_str(z[c])
@@ -81,7 +82,7 @@ def load_zoning():
 
 
 def load_parcels():
-    p = gpd.read_file(RAW / "parcels.geojson").to_crs(METRIC_CRS)
+    p = read_raw("parcels").to_crs(METRIC_CRS)
     p = p.rename(columns={"OBJECTID": "parcel_oid"})
     p["geometry"] = shapely.make_valid(p.geometry.values)
     p["parcel_area_m2"] = p.area
@@ -140,7 +141,7 @@ def per_parcel(pieces):
 
 def flag_overlap(p, layer, name, min_share=0.5):
     """Boolean: at least min_share of the parcel lies inside the given polygon layer."""
-    g = gpd.read_file(RAW / f"{layer}.geojson").to_crs(METRIC_CRS)
+    g = read_raw(layer).to_crs(METRIC_CRS)
     g["geometry"] = shapely.make_valid(g.geometry.values)
     g = g[["geometry"]].dissolve()
     inter = shapely.area(shapely.intersection(p.geometry.values, g.geometry.iloc[0]))
@@ -149,7 +150,7 @@ def flag_overlap(p, layer, name, min_share=0.5):
 
 def largest_overlap(p, layer, cols, prefix):
     """For each parcel, attributes of the polygon in `layer` covering most of it (>= 50%)."""
-    g = gpd.read_file(RAW / f"{layer}.geojson").to_crs(METRIC_CRS)
+    g = read_raw(layer).to_crs(METRIC_CRS)
     g["geometry"] = shapely.make_valid(g.geometry.values)
     g = g[cols + ["geometry"]].reset_index(names="gid")
     pairs = gpd.sjoin(p[["parcel_oid", "geometry"]], g, predicate="intersects")

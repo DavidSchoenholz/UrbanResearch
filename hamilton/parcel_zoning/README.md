@@ -41,8 +41,12 @@ legal by-law.
 
 ## Method
 
-1. `scripts/fetch.py` downloads the layers below as GeoJSON (EPSG:4326) into `raw/` (gitignored;
-   about 210 MB) and records server counts and download times in `raw/manifest.json`.
+1. `scripts/fetch.py` downloads the layers below as gzip-compressed GeoJSON (EPSG:4326) into
+   `raw/<key>.geojson.gz` and records server counts and download times in `raw/manifest.json`.
+   The 2026-10-30 download is committed (39 MB compressed; 203 MB plain, and the 136 MB parcel
+   file would exceed GitHub's 100 MB limit uncompressed). Scripts read it through
+   `scripts/rawio.py`; to open a layer elsewhere, use `gpd.read_file("/vsigzip/raw/parcels.geojson.gz")`
+   or `gunzip -k` it.
 2. `scripts/build_parcel_zoning.py` projects both layers to UTM 17N (EPSG:26917), intersects every
    parcel with the zoning polygons it touches and computes each piece's share of the parcel's area.
    - Pieces under **5%** of the parcel or under **10 m²** are treated as digitizing slivers

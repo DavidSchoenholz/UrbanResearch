@@ -1,9 +1,9 @@
 """Download the City of Hamilton layers needed for the parcel zoning map.
 
 Pages through the City's public ArcGIS REST MapServer layers and saves each as
-GeoJSON (EPSG:4326) in raw/. Also writes raw/manifest.json recording the URL,
-server-side record count, downloaded count and download time of each layer, so a
-later run can tell whether the source changed.
+gzip-compressed GeoJSON (EPSG:4326) in raw/<key>.geojson.gz (see rawio.py). Also writes
+raw/manifest.json recording the URL, server-side record count, downloaded count and
+download time of each layer, so a later run can tell whether the source changed.
 
 Usage (from hamilton/parcel_zoning/):
     python scripts/fetch.py            # all layers
@@ -12,6 +12,7 @@ Usage (from hamilton/parcel_zoning/):
 No API key is needed. The server caps each request (maxRecordCount 5000-20000),
 so we page with resultOffset ordered by OBJECTID.
 """
+import gzip
 import json
 import sys
 import time
@@ -80,8 +81,7 @@ def fetch_layer(key):
         print(f"  {offset}/{n}", flush=True)
 
     RAW.mkdir(exist_ok=True)
-    out = RAW / f"{key}.geojson"
-    with open(out, "w") as f:
+    with gzip.open(RAW / f"{key}.geojson.gz", "wt") as f:
         json.dump({"type": "FeatureCollection", "features": feats}, f)
 
     return {

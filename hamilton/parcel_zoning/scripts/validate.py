@@ -15,8 +15,9 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-import geopandas as gpd
 import pandas as pd
+
+from rawio import read_raw
 
 ROOT = Path(__file__).resolve().parent.parent
 URL = "https://spatialsolutions.hamilton.ca/webgis/rest/services/General/Zoning/MapServer/9/query"
@@ -44,7 +45,7 @@ def main(n):
     tab = pd.read_csv(ROOT / "output" / "hamilton_parcel_zoning.csv.gz", dtype=str)
     tab = tab[(tab["has_zoning"] == "True") & (tab["geometry_suspect"] == "False")]
     strata = {"single_zone": tab[tab["split_zoned"] == "False"], "split_zoned": tab[tab["split_zoned"] == "True"]}
-    parcels = gpd.read_file(ROOT / "raw" / "parcels.geojson").set_index("OBJECTID")
+    parcels = read_raw("parcels").set_index("OBJECTID")
 
     result = {"checked_at": pd.Timestamp.now(tz="UTC").isoformat(timespec="seconds"), "seed": SEED}
     mismatches = []
