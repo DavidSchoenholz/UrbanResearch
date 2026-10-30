@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+# Raw downloads are re-fetchable with the fetch scripts; don't commit them.
+hamilton/parcel_zoning/raw/
+*.parquet
