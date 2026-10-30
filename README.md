@@ -37,4 +37,5 @@ Data sources are suggestions and still need to be verified before relying on the
 - **Heat-island equity:** tree canopy and surface materials against heat-related ER visits, by income and race.
 
 ## Projects
+- [`trreb_marketwatch/`](trreb_marketwatch/README.md): downloads TRREB's free public Market Watch and community reports, validates them, and builds a Toronto price map and district price log (code only; TRREB data is not committed)
 - [`phase2/`](phase2/README.md): skeleton for studying zoning -> application -> permit -> completion in Toronto (synthetic-data tested only; no real data loaded)

@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toronto Home Prices</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --base: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --r1: #cde2fb; --r2: #9ec5f4; --r3: #6da7ec; --r4: #3987e5; --r5: #256abf; --r6: #184f95; --r7: #0d366b;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+    --nodata: #e1e0d9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19;
+      --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --base: #383835; --border: rgba(255,255,255,0.10);
+      --r1: #0d366b; --r2: #104281; --r3: #184f95; --r4: #256abf; --r5: #3987e5; --r6: #6da7ec; --r7: #cde2fb;
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+      --nodata: #2c2c2a;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19;
+    --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --base: #383835; --border: rgba(255,255,255,0.10);
+    --r1: #0d366b; --r2: #104281; --r3: #184f95; --r4: #256abf; --r5: #3987e5; --r6: #6da7ec; --r7: #cde2fb;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --nodata: #2c2c2a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+         font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 0 0 2px; }
+  .sub { color: var(--ink-2); margin: 0 0 16px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 16px; align-items: end; margin-bottom: 16px; }
+  label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-2); }
+  select, button { font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--base);
+                   border-radius: 6px; padding: 6px 10px; }
+  button { cursor: pointer; }
+  button:hover { background: var(--grid); }
+  button:focus-visible, select:focus-visible, svg:focus-visible, .area:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+  svg { display: block; width: 100%; height: auto; }
+  .area { stroke: var(--surface); stroke-width: 1; cursor: pointer; }
+  .area:hover, .area:focus-visible, .area.selected { stroke: var(--ink); stroke-width: 2; }
+  .legend { display: flex; gap: 2px; margin-top: 8px; align-items: flex-start; flex-wrap: wrap; }
+  .legend .step { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: var(--ink-2); min-width: 44px; }
+  .legend .sw { width: 44px; height: 10px; }
+  .key { display: inline-flex; align-items: center; gap: 6px; margin-right: 14px; font-size: 12px; color: var(--ink-2); }
+  .key i { width: 14px; height: 10px; display: inline-block; border: 1px solid var(--border); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+  .chip { padding: 3px 10px; border-radius: 999px; font-size: 13px; border-left-width: 6px; }
+  .chip[aria-pressed="true"] { background: var(--grid); font-weight: 600; }
+  #tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface); color: var(--ink);
+         border: 1px solid var(--base); border-radius: 8px; padding: 8px 10px; font-size: 13px; display: none; max-width: 280px;
+         box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+  #tip .v { font-weight: 700; } #tip .l { color: var(--ink-2); } #tip .t { color: var(--ink-2); margin-bottom: 4px; }
+  #tip .k { display: inline-block; width: 12px; height: 0; border-top: 3px solid; margin-right: 6px; vertical-align: middle; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 4px 8px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  .tablewrap { max-height: 320px; overflow: auto; margin-top: 8px; }
+  .note { color: var(--ink-2); font-size: 13px; }
+  .hint { color: var(--muted); }
+  details summary { cursor: pointer; color: var(--ink-2); font-size: 13px; }
+  .axis { fill: var(--muted); font-size: 11px; }
+  .lbl { fill: var(--ink-2); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Toronto home prices by area</h1>
+  <p class="sub">Existing-home sales, all home types, from TRREB Market Watch (monthly) and community reports (quarterly).</p>
+
+  <div class="filters" role="group" aria-label="Filters">
+    <label>Quarter (map)<select id="quarter"></select></label>
+    <label>Measure<select id="metric">
+      <option value="avg_price">Average price</option>
+      <option value="median_price">Median price</option>
+      <option value="sales">Number of sales</option>
+    </select></label>
+  </div>
+
+  <section class="card" aria-labelledby="h-map">
+    <h2 id="h-map">Neighbourhoods</h2>
+    <p class="note" id="map-sub"></p>
+    <div class="grid">
+      <div>
+        <svg id="map" role="img" aria-label="Map of Toronto neighbourhoods coloured by price"></svg>
+        <div class="legend" id="legend"></div>
+        <div style="margin-top:8px">
+          <span class="key"><i style="background:var(--nodata)"></i>Matched, but not reported this quarter</span>
+          <span class="key"><i style="background:repeating-linear-gradient(45deg,var(--nodata) 0 3px,var(--muted) 3px 4px)"></i>No TRREB community of this name</span>
+        </div>
+      </div>
+      <div>
+        <h2 id="detail-title">Price log</h2>
+        <p class="note hint" id="detail-sub">Select a neighbourhood on the map.</p>
+        <svg id="detail" viewBox="0 0 420 220" role="img" aria-label="Price log for the selected neighbourhood"></svg>
+      </div>
+    </div>
+    <details><summary>Table view (all mapped neighbourhoods, selected quarter)</summary>
+      <div class="tablewrap"><table id="map-table"></table></div></details>
+    <details><summary id="unmapped-sum"></summary><p class="note" id="unmapped"></p></details>
+  </section>
+
+  <section class="card" aria-labelledby="h-dist">
+    <h2 id="h-dist">Districts since 2011</h2>
+    <p class="note">TRREB districts have no published boundaries, so they appear as a price log rather than on the map. Pick up to four.</p>
+    <div class="chips" id="chips" role="group" aria-label="Districts"></div>
+    <svg id="chart" viewBox="0 0 900 340" tabindex="0" role="img" aria-label="Monthly price by district"></svg>
+    <details><summary>Table view (selected districts, monthly)</summary>
+      <div class="tablewrap"><table id="dist-table"></table></div></details>
+  </section>
+
+  <section class="note">
+    <p><strong>Reading these numbers.</strong> Averages are not quality-adjusted: a month with more expensive sales lifts the
+    average without prices rising, and small areas are noisy. Medians are steadier. TRREB suppresses community figures when
+    there were two or fewer sales, and says its quarterly community figures may not match sums of its monthly reports.</p>
+    <p><strong>Sources.</strong> Toronto Regional Real Estate Board Market Watch and Community Market Reports, as published
+    (TRREB retains copyright; this page is for private analysis). Neighbourhood boundaries: City of Toronto Open Data
+    (Open Government Licence – Toronto). Communities are matched to neighbourhoods by exact name only.</p>
+  </section>
+</main>
+<div id="tip" role="status"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const METRICS = {
+  avg_price: {label: 'Average price', idx: 1, money: true},
+  median_price: {label: 'Median price', idx: 2, money: true},
+  sales: {label: 'Sales', idx: 0, money: false},
+};
+const state = {q: D.quarters[D.quarters.length - 1], metric: 'avg_price', area: null, sel: ['CITY', 'C01', 'W05'].filter(c => D.codes.includes(c))};
+const SLOTS = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)'];
+const slotOf = {}; state.sel.forEach((c, i) => slotOf[c] = i);
+
+const money = v => v == null ? '–' : '$' + Math.round(v).toLocaleString('en-CA');
+const compact = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'M' : '$' + Math.round(v / 1e3) + 'K';
+const fmt = (v, m) => v == null ? '–' : (METRICS[m].money ? money(v) : Math.round(v).toLocaleString('en-CA'));
+const short = (v, m) => METRICS[m].money ? compact(v) : Math.round(v).toLocaleString('en-CA');
+const name = c => c === 'CITY' ? 'City of Toronto' : c;
+const el = (tag, attrs = {}, text) => {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+};
+const html = (tag, attrs = {}, text) => {
+  const e = document.createElement(tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  return e;
+};
+
+// ---- tooltip (textContent only; labels are untrusted data)
+const tip = $('tip');
+function showTip(x, y, build) {
+  tip.replaceChildren(); build(tip); tip.style.display = 'block';
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.max(8, Math.min(x + 14, innerWidth - r.width - 8)) + 'px';
+  tip.style.top = Math.max(8, Math.min(y + 14, innerHeight - r.height - 8)) + 'px';
+}
+const hideTip = () => tip.style.display = 'none';
+const row = (parent, label, value) => {
+  const d = html('div'); d.append(html('span', {class: 'v'}, value), html('span', {class: 'l'}, ' ' + label)); parent.append(d);
+};
+
+// ---- map
+const allVals = m => {
+  const i = METRICS[m].idx, out = [];
+  for (const id in D.values) for (const q in D.values[id]) { const v = D.values[id][q][i]; if (v != null) out.push(v); }
+  return out.sort((a, b) => a - b);
+};
+function breaks(m) {
+  const v = allVals(m); const b = [];
+  for (let i = 0; i <= 7; i++) b.push(v[Math.min(v.length - 1, Math.floor(i * (v.length - 1) / 7))]);
+  return b;
+}
+function bin(v, b) { for (let i = 6; i > 0; i--) if (v >= b[i]) return i; return 0; }
+const val = (id, q, m) => (D.values[id] && D.values[id][q]) ? D.values[id][q][METRICS[m].idx] : null;
+
+function buildMap() {
+  const svg = $('map'); svg.setAttribute('viewBox', `0 0 ${D.width} ${D.height}`);
+  const defs = el('defs'), pat = el('pattern', {id: 'hatch', width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)'});
+  pat.append(el('rect', {width: 6, height: 6, fill: 'var(--nodata)'}), el('line', {x1: 0, y1: 0, x2: 0, y2: 6, stroke: 'var(--muted)', 'stroke-width': 1.5}));
+  defs.append(pat); svg.append(defs);
+  for (const a of D.areas) {
+    const p = el('path', {d: a.d, class: 'area', 'data-id': a.id, tabindex: 0, role: 'button', 'aria-label': a.name});
+    p.addEventListener('pointermove', e => areaTip(a, e.clientX, e.clientY));
+    p.addEventListener('pointerleave', hideTip);
+    p.addEventListener('focus', () => { const r = p.getBoundingClientRect(); areaTip(a, r.left + r.width / 2, r.top + r.height / 2); });
+    p.addEventListener('blur', hideTip);
+    p.addEventListener('click', () => selectArea(a.id));
+    p.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectArea(a.id); } });
+    svg.append(p);
+  }
+}
+function areaTip(a, x, y) {
+  showTip(x, y, t => {
+    t.append(html('div', {class: 't'}, a.name));
+    if (!a.community) { t.append(html('div', {class: 'l'}, 'No TRREB community of this name')); return; }
+    t.append(html('div', {class: 'l'}, `TRREB: ${a.community} (${a.district})`));
+    const v = D.values[a.id] && D.values[a.id][state.q];
+    if (!v) { t.append(html('div', {class: 'l'}, 'Not reported this quarter')); return; }
+    row(t, 'average', money(v[1])); row(t, 'median', money(v[2])); row(t, 'sales', fmt(v[0], 'sales'));
+  });
+}
+function paintMap() {
+  const m = state.metric, b = breaks(m), q = state.q;
+  document.querySelectorAll('.area').forEach(p => {
+    const a = D.areas.find(x => x.id === p.dataset.id), v = val(a.id, q, m);
+    p.setAttribute('fill', !a.community ? 'url(#hatch)' : v == null ? 'var(--nodata)' : `var(--r${bin(v, b) + 1})`);
+    p.classList.toggle('selected', a.id === state.area);
+  });
+  const lg = $('legend'); lg.replaceChildren();
+  for (let i = 0; i < 7; i++) {
+    const s = html('div', {class: 'step'}), sw = html('div', {class: 'sw'});
+    sw.style.background = `var(--r${i + 1})`;
+    s.append(sw, html('span', {}, (i === 0 ? '' : '≥ ') + short(b[i], m))); lg.append(s);
+  }
+  $('map-sub').textContent = `${METRICS[m].label}, ${q.replace('Q', ' Q')}. Colour classes are fixed across quarters so the map can be compared over time.`;
+  paintTable();
+}
+function paintTable() {
+  const t = $('map-table'), m = state.metric; t.replaceChildren();
+  const head = html('tr'); ['Neighbourhood', 'TRREB community', 'District', 'Sales', 'Average', 'Median'].forEach(h => head.append(html('th', {}, h)));
+  t.append(head);
+  D.areas.filter(a => a.community).sort((x, y) => x.name.localeCompare(y.name)).forEach(a => {
+    const v = (D.values[a.id] || {})[state.q] || [null, null, null], r = html('tr');
+    [a.name, a.community, a.district, fmt(v[0], 'sales'), money(v[1]), money(v[2])].forEach(c => r.append(html('td', {}, c)));
+    t.append(r);
+  });
+}
+
+// ---- detail price log for one neighbourhood (single series: emphasis colour)
+function selectArea(id) { state.area = id; paintMap(); paintDetail(); }
+function paintDetail() {
+  const svg = $('detail'); svg.replaceChildren();
+  const a = D.areas.find(x => x.id === state.area), m = state.metric;
+  svg.style.display = a ? '' : 'none';
+  if (!a) return;
+  $('detail-title').textContent = a.name;
+  if (!a.community) { $('detail-sub').textContent = 'No TRREB community of this name, so no prices to show.'; return; }
+  $('detail-sub').textContent = `${METRICS[m].label} by quarter · TRREB community: ${a.community} (${a.district})`;
+  const qs = D.quarters, vs = qs.map(q => val(a.id, q, m)), ok = vs.filter(v => v != null);
+  if (!ok.length) { $('detail-sub').textContent += ' · no reported quarters'; return; }
+  const L = 52, R = 12, T = 12, B = 28, W = 420, H = 220;
+  let lo = Math.min(...ok), hi = Math.max(...ok); if (!METRICS[m].money) lo = 0;
+  if (hi === lo) { hi += 1; lo -= 1; }
+  const pad = (hi - lo) * 0.1, y0 = METRICS[m].money ? lo - pad : 0, y1 = hi + pad;
+  const X = i => L + (qs.length === 1 ? 0 : i * (W - L - R) / (qs.length - 1));
+  const Y = v => T + (1 - (v - y0) / (y1 - y0)) * (H - T - B);
+  for (let k = 0; k <= 3; k++) {
+    const v = y0 + (y1 - y0) * k / 3, y = Y(v);
+    svg.append(el('line', {x1: L, x2: W - R, y1: y, y2: y, stroke: 'var(--grid)'}), el('text', {x: L - 6, y: y + 4, 'text-anchor': 'end', class: 'axis'}, short(v, m)));
+  }
+  svg.append(el('line', {x1: L, x2: W - R, y1: H - B, y2: H - B, stroke: 'var(--base)'}));
+  [0, qs.length - 1].forEach(i => svg.append(el('text', {x: X(i), y: H - 8, 'text-anchor': i ? 'end' : 'start', class: 'axis'}, qs[i].replace('Q', ' Q'))));
+  let d = '', pen = false;
+  vs.forEach((v, i) => { if (v == null) { pen = false; return; } d += (pen ? 'L' : 'M') + X(i) + ' ' + Y(v); pen = true; });
+  svg.append(el('path', {d, fill: 'none', stroke: 'var(--s1)', 'stroke-width': 2, 'stroke-linejoin': 'round'}));
+  vs.forEach((v, i) => {
+    if (v == null) return;
+    const c = el('circle', {cx: X(i), cy: Y(v), r: 4, fill: 'var(--s1)', stroke: 'var(--surface)', 'stroke-width': 2});
+    const hit = el('circle', {cx: X(i), cy: Y(v), r: 14, fill: 'transparent', tabindex: 0});
+    const show = (x, y) => showTip(x, y, t => { t.append(html('div', {class: 't'}, qs[i].replace('Q', ' Q'))); row(t, METRICS[m].label.toLowerCase(), fmt(v, m)); });
+    hit.addEventListener('pointermove', e => show(e.clientX, e.clientY));
+    hit.addEventListener('pointerleave', hideTip);
+    hit.addEventListener('focus', () => { const r = hit.getBoundingClientRect(); show(r.left + r.width / 2, r.top); });
+    hit.addEventListener('blur', hideTip);
+    svg.append(c, hit);
+  });
+}
+
+// ---- district price log (lines, crosshair, tooltip, direct end labels)
+function niceTicks(lo, hi, n = 5) {
+  const raw = (hi - lo) / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  const step = (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p, out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(v);
+  return out;
+}
+let hoverIdx = null;
+function paintChart() {
+  const svg = $('chart'); svg.replaceChildren();
+  const m = state.metric, P = D.periods, n = P.length, sel = state.sel;
+  const cw = Math.round(svg.getBoundingClientRect().width) || 900;   // size to the container so text stays readable
+  const W = Math.max(320, cw), narrow = W < 600, H = narrow ? 300 : 340, L = narrow ? 50 : 64, R = narrow ? 92 : 110, T = 12, B = 28;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const data = sel.map(c => D.series[m][c]);
+  const flat = data.flat().filter(v => v != null);
+  if (!flat.length) { svg.append(el('text', {x: L, y: 40, class: 'lbl'}, 'Select a district below.')); return; }
+  let lo = METRICS[m].money ? Math.min(...flat) * 0.95 : 0, hi = Math.max(...flat) * 1.05;
+  const X = i => L + i * (W - L - R) / (n - 1), Y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  niceTicks(lo, hi).forEach(v => svg.append(el('line', {x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: 'var(--grid)'}), el('text', {x: L - 8, y: Y(v) + 4, 'text-anchor': 'end', class: 'axis'}, short(v, m))));
+  svg.append(el('line', {x1: L, x2: W - R, y1: H - B, y2: H - B, stroke: 'var(--base)'}));
+  P.forEach((p, i) => { if (p.endsWith('-01') && (+p.slice(0, 4)) % (narrow ? 4 : 2) === 1) svg.append(el('text', {x: X(i), y: H - 8, 'text-anchor': 'middle', class: 'axis'}, p.slice(0, 4))); });
+  const ends = [];
+  sel.forEach((c, k) => {
+    let d = '', pen = false, last = null;
+    data[k].forEach((v, i) => { if (v == null) { pen = false; return; } d += (pen ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1); pen = true; last = i; });
+    svg.append(el('path', {d, fill: 'none', stroke: SLOTS[slotOf[c]], 'stroke-width': 2, 'stroke-linejoin': 'round'}));
+    if (last != null) ends.push({c, y: Y(data[k][last]), x: X(last)});
+  });
+  ends.sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) if (ends[i].y - ends[i - 1].y < 15) ends[i].y = ends[i - 1].y + 15;
+  ends.forEach(e => svg.append(el('text', {x: e.x + 8, y: e.y + 4, class: 'lbl'}, name(e.c))));
+  const cross = el('line', {y1: T, y2: H - B, stroke: 'var(--muted)', 'stroke-width': 1, visibility: 'hidden'});
+  const dots = sel.map(c => el('circle', {r: 4, fill: SLOTS[slotOf[c]], stroke: 'var(--surface)', 'stroke-width': 2, visibility: 'hidden'}));
+  svg.append(cross, ...dots);
+  const overlay = el('rect', {x: L, y: T, width: W - L - R, height: H - T - B, fill: 'transparent'});
+  svg.append(overlay);
+  const at = (i, cx, cy) => {
+    hoverIdx = i; cross.setAttribute('x1', X(i)); cross.setAttribute('x2', X(i)); cross.setAttribute('visibility', 'visible');
+    sel.forEach((c, k) => { const v = data[k][i]; dots[k].setAttribute('visibility', v == null ? 'hidden' : 'visible'); if (v != null) { dots[k].setAttribute('cx', X(i)); dots[k].setAttribute('cy', Y(v)); } });
+    showTip(cx, cy, t => {
+      t.append(html('div', {class: 't'}, P[i]));
+      sel.forEach((c, k) => { const d = html('div'), key = html('span', {class: 'k'}); key.style.borderTopColor = SLOTS[slotOf[c]]; d.append(key, html('span', {class: 'v'}, fmt(data[k][i], m)), html('span', {class: 'l'}, ' ' + name(c))); t.append(d); });
+    });
+  };
+  const clear = () => { cross.setAttribute('visibility', 'hidden'); dots.forEach(d => d.setAttribute('visibility', 'hidden')); hideTip(); hoverIdx = null; };
+  overlay.addEventListener('pointermove', e => {
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width;
+    at(Math.max(0, Math.min(n - 1, Math.round((x - L) / ((W - L - R) / (n - 1))))), e.clientX, e.clientY);
+  });
+  overlay.addEventListener('pointerleave', clear);
+  svg.onkeydown = e => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault(); const i = Math.max(0, Math.min(n - 1, (hoverIdx == null ? n - 1 : hoverIdx) + (e.key === 'ArrowLeft' ? -1 : 1)));
+    const r = svg.getBoundingClientRect(); at(i, r.left + X(i) * r.width / W, r.top + 40);
+  };
+  svg.onblur = clear;
+  paintDistTable();
+}
+function paintDistTable() {
+  const t = $('dist-table'), m = state.metric; t.replaceChildren();
+  const head = html('tr'); head.append(html('th', {}, 'Month')); state.sel.forEach(c => head.append(html('th', {}, name(c)))); t.append(head);
+  for (let i = D.periods.length - 1; i >= 0; i--) {
+    const r = html('tr'); r.append(html('td', {}, D.periods[i]));
+    state.sel.forEach(c => r.append(html('td', {}, fmt(D.series[m][c][i], m)))); t.append(r);
+  }
+}
+function buildChips() {
+  const box = $('chips'); box.replaceChildren();
+  D.codes.forEach(c => {
+    const b = html('button', {class: 'chip', type: 'button', 'aria-pressed': state.sel.includes(c)}, name(c));
+    b.style.borderLeftColor = state.sel.includes(c) ? SLOTS[slotOf[c]] : 'var(--base)';
+    b.addEventListener('click', () => {
+      if (state.sel.includes(c)) { state.sel = state.sel.filter(x => x !== c); delete slotOf[c]; }
+      else {
+        if (state.sel.length >= 4) { b.title = 'Up to four at a time'; return; }
+        const free = [0, 1, 2, 3].find(s => !Object.values(slotOf).includes(s)); slotOf[c] = free; state.sel.push(c);
+      }
+      buildChips(); paintChart();
+    });
+    box.append(b);
+  });
+}
+
+// ---- wiring
+function init() {
+  D.quarters.slice().reverse().forEach(q => $('quarter').append(html('option', {value: q}, q.replace('Q', ' Q'))));
+  $('quarter').value = state.q; $('metric').value = state.metric;
+  $('quarter').onchange = e => { state.q = e.target.value; paintMap(); };
+  $('metric').onchange = e => { state.metric = e.target.value; paintMap(); paintDetail(); paintChart(); };
+  const mapped = D.areas.filter(a => a.community).length;
+  $('unmapped-sum').textContent = `${mapped} of ${D.areas.length} neighbourhoods mapped · ${D.unmapped.length} TRREB communities not matched (list)`;
+  $('unmapped').textContent = D.unmapped.length ? D.unmapped.map(u => `${u.community} (${u.district})`).join(' · ') : 'None.';
+  buildMap(); buildChips(); paintMap(); paintDetail(); paintChart();
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(paintChart, 150); });
+}
+init();
+</script>
+</body>
+</html>

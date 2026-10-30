@@ -7,3 +7,7 @@ raw/
 out/
 outputs/
 *.parquet
+
+# TRREB downloads and derived outputs: copyright TRREB, never commit
+/trreb_marketwatch/data
+/trreb_marketwatch/out
